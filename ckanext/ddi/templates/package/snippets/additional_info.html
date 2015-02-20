@@ -1,0 +1,165 @@
+<section class="additional-info module-content">
+  <table class="table package-metadata">
+    <tr>
+      <td>
+        <p class="heading">{{ _("Author") }}</p>
+        {% if pkg.author_email %}
+          <p class="metadata">{{ h.mail_to(email_address=pkg.author_email, name=pkg.author) }}</p>
+        {% elif pkg.author %}
+          <p class="metadata">{{ pkg.author }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="heading">{{ _("Date first published") }}</p>
+        {% if pkg.dateFirstPublished %}
+          {% set date = h.validate_date(pkg.dateFirstPublished) %}
+          {% if date %}
+            <p class="metadata">{{ date }}</p>
+          {% endif %}
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="heading">{{ _('Maintainer') }}</p>
+        {% if pkg.maintainer_email %}
+          <p class="metadata">{{ h.mail_to(email_address=pkg.maintainer_email, name=pkg.maintainer) }}</p>
+        {% elif pkg.maintainer %}
+          <p class="metadata">{{ pkg.maintainer }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="heading">{{ _("Time range") }}</p>
+        {% if pkg.timeRange %}
+          <p class="metadata">{{ pkg.timeRange }}</p>
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="heading">{{ _("Data type") }}</p>
+        {% if pkg.dataType %}
+          <p class="metadata">{{ pkg.dataType[0] }}</p>
+        {% else %}
+          {% for extra in h.sorted_extras(pkg.extras) %}
+            {% set key, value = extra %}
+            {% if key == "dataType" and value %}
+              <p class="metadata">{{ value }}</p>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </td>
+      <td>
+        <p class="heading">{{ _('Date last updated')|safe }}</p>
+        {% if pkg.dateLastUpdated %}
+          {% set date = h.validate_date(pkg.dateLastUpdated) %}
+          {% if date %}
+            <p class="metadata">{{ date }}</p>
+          {% endif %}
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="heading">{{ _('Source') }}</p>
+        {% if pkg.url %}
+          <p class="metadata">{{ pkg.url }}</p>
+        {% else %}
+          <p class="metadata">{{ pkg.author }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="heading">{{ _("Version") }}</p>
+        {% if pkg.version %}
+          <p class="metadata">{{ pkg.version }}</p>
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="heading">{{ _("Spatial relationship") }}</p>
+        {% if pkg.spatialRelationship %}
+          <p class="metadata">{{ pkg.spatialRelationship }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="heading">{{ _("Update interval")|safe }}</p>
+        {% if pkg.updateInterval %}
+          <p class="metadata">{{ pkg.updateInterval[0] }}</p>
+        {% else %}
+          {% for extra in h.sorted_extras(pkg.extras) %}
+            {% set key, value = extra %}
+            {% if key == "updateInterval" and value %}
+              <p class="metadata">{{ value }}</p>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="heading">{{ _("Legal information") }}</p>
+        {% if pkg.legalInformation %}
+          <p class="metadata">{{ pkg.legalInformation }}</p>
+        {% endif %}
+      </td>
+      <td>
+      </td>
+    </tr>
+  </table>
+
+  {% if pkg.dataQuality %}
+    <div class="package-dataquality">
+    <h5>{{ _("Data quality") }}</h5>
+      {{ pkg.dataQuality }}
+    </div>
+  {% endif %}
+
+  {% set comments = [] %}
+  {% if pkg.sszBemerkungen %}
+    {% do comments.append(pkg.sszBemerkungen) %}
+  {% else %}
+    {% for extra in h.sorted_extras(pkg.extras) %}
+      {% set key, value = extra %}
+      {% if key == "sszBemerkungen" and value %}
+        {% do comments.append(value) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if comments %}
+    <h3>{{ _("Comments") }}</h3>
+    <div class="package-comments">
+      {{ h.render_markdown(comments[0]) }}
+    </div>
+  {% endif %}
+
+  {% set attribs = [] %}
+  {% if pkg.sszFields %}
+    {% do attribs.append(pkg.sszFields) %}
+  {% else %}
+    {% for extra in h.sorted_extras(pkg.extras) %}
+      {% set key, value = extra %}
+      {% if key == "sszFields" and value %}
+        {% do attribs.append(value) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if h.load_json(attribs[0]) %}
+    <h3>Attribute</h3>
+    <div class="package-attributes">
+      <table class="table table-striped table-bordered table-condensed">
+        <tbody>
+          {% for key, value in h.load_json(attribs[0]) %}
+            <tr><th>{{key}}</th></tr>
+            <tr><td>{{value}}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</section>
