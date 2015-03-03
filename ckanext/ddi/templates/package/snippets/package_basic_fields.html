@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block package_version_fields_production_date %}
-  {{ form.input('idNumber', id='field-idNumber', label=_('ID number'), placeholder=_('eg. The ID number'), value=data.idNumber, error=errors.idNumber, classes=['control-full']) }}
+  {{ form.input('productionDate', id='field-productionDate', label=_('Production date'), placeholder=_('eg. The production date'), value=data.productionDate, error=errors.productionDate, classes=['control-full']) }}
 {% endblock %}
 
 {% block package_version_fields_notes %}

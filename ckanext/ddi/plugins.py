@@ -17,6 +17,7 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     """
 
     plugins.implements(plugins.IConfigurer, inherit=False)
+    plugins.implements(plugins.IDatasetForm, inherit=False)
 
     def update_config(self, config):
         pass
@@ -26,7 +27,7 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def is_fallback(self):
         # Return True to register this plugin as the default handler for
-        # package types not handled by any other IConfigurer plugin.
+        # package types not handled by any other IDatasetForm plugin.
         return True
 
     def package_types(self):
@@ -292,13 +293,11 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     """
 
     plugins.implements(plugins.IConfigurer, inherit=False)
-    plugins.implements(plugins.IDatasetForm, inherit=False)
     plugins.implements(plugins.ITemplateHelpers, inherit=False)
 
     def update_config(self, config):
         tk.add_template_directory(config, 'templates')
         tk.add_public_directory(config, 'public')
-        tk.add_resource('fanstatic', 'ddi')
 
     def get_helpers(self):
         return {}
