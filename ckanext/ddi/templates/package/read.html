@@ -30,7 +30,7 @@
     {% endblock %}
 
     {% block package_desc %}
-      <p><span class="fieldname">Description:</span>{{ h.markdown_extract(pkg.description) }}</p>
+      <p><span class="fieldname">Description:</span> {{ h.render_markdown(pkg.description) }}</p>
     {% endblock %}
   {% endblock %}
 

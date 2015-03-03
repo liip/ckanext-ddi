@@ -1,158 +1,143 @@
+ <h3>{{ _('Additional Info') }}</h3>
+
 <section class="additional-info module-content" xmlns="http://www.w3.org/1999/html">
   <table class="table package-version">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Production date") }}</p>
-        {% if pkg.productionDate %}
+      {% if pkg.productionDate %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Production date") }}</p>
           <p class="metadata">{{ pkg.productionDate }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="fieldname">{{ _('Notes') }}</p>
-        {% if pkg.notes %}
-        <p class="metadata">{{ pkg.notes }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="table package-overview">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Kind of data") }}</p>
-        {% if pkg.kindOfData %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.notes %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _('Notes') }}</p>
+          <p class="metadata">{{ h.render_markdown(pkg.notes) }}</p>
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.kindOfData %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Kind of data") }}</p>
           <p class="metadata">{{ pkg.kindOfData }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="fieldname">{{ _("Unit of analysis") }}</p>
-        {% if pkg.unitOfAnalysis %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.unitOfAnalysis %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Unit of analysis") }}</p>
           <p class="metadata">{{ pkg.unitOfAnalysis }}</p>
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Abstract") }}</p>
-        {% if pkg.abstract %}
-        <p class="metadata">{{ pkg.abstract }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="package-scope">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _('Description of scope')|safe }}</p>
-        {% if pkg.descriptionOfScope %}
-          <p class="metadata">{{ pkg.descriptionOfScope }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="package-coverage">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Country") }}</p>
-        {% if pkg.country %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.abstract %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Abstract") }}</p>
+          <p class="metadata">{{ h.render_markdown(pkg.abstract) }}</p>
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.descriptionOfScope %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _('Description of scope')|safe }}</p>
+          <p class="metadata">{{ h.render_markdown(pkg.descriptionOfScope) }}</p>
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.country %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Country") }}</p>
           <p class="metadata">{{ pkg.country }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="fieldname">{{ _("Geographic coverage")|safe }}</p>
-        {% if pkg.geographicCoverage %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.geographicCoverage %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Geographic coverage")|safe }}</p>
           <p class="metadata">{{ pkg.geographicCoverage }}</p>
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Universe") }}</p>
-        {% if pkg.universe %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.universe %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Universe") }}</p>
           <p class="metadata">{{ pkg.universe }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="package-producers">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Primary investigator") }}</p>
-        {% if pkg.primaryInvestigator %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.primaryInvestigator %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Primary investigator") }}</p>
           <p class="metadata">{{ pkg.primaryInvestigator }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="fieldname">{{ _("Other producers")|safe }}</p>
-        {% if pkg.otherProducers %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.otherProducers %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Other producers")|safe }}</p>
           <p class="metadata">{{ pkg.otherProducers }}</p>
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Funding") }}</p>
-        {% if pkg.funding %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.funding %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Funding") }}</p>
           <p class="metadata">{{ pkg.funding }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="package-sampling">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _('Sampling procedure')|safe }}</p>
-        {% if pkg.samplingProcedure %}
-          <p class="metadata">{{ pkg.samplingProcedure }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="package-data-collection">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _('Dates of data collection')|safe }}</p>
-        {% if pkg.datesOfDataCollection %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.samplingProcedure %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _('Sampling procedure')|safe }}</p>
+          <p class="metadata">{{ h.render_markdown(pkg.samplingProcedure) }}</p>
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.datesOfDataCollection %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _('Dates of data collection')|safe }}</p>
           <p class="metadata">{{ pkg.datesOfDataCollection }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="table package-data-appraisal">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _("Access authority") }}</p>
-        {% if pkg.accessAuthority %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.accessAuthority %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _("Access authority") }}</p>
           <p class="metadata">{{ pkg.accessAuthority }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="fieldname">{{ _('Citation requirement') }}</p>
-        {% if pkg.citationRequirement %}
-        <p class="metadata">{{ pkg.citationRequirement }}</p>
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-
-  <table class="package-contacts">
-    <tr>
-      <td>
-        <p class="fieldname">{{ _('Contact persons')|safe }}</p>
-        {% if pkg.contactPersons %}
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.citationRequirement %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _('Citation requirement') }}</p>
+          <p class="metadata">{{ pkg.citationRequirement }}</p>
+          </td>
+        <tr>
+      {% endif %}
+      {% if pkg.contactPersons %}
+        <tr>
+          <td>
+          <p class="fieldname">{{ _('Contact persons')|safe }}</p>
           <p class="metadata">{{ pkg.contactPersons }}</p>
-        {% endif %}
-      </td>
-    </tr>
+          </td>
+        <tr>
+      {% endif %}
   </table>
 
 </section>
