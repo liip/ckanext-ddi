@@ -24,13 +24,13 @@
     </h1>
 
     {% block package_identification %}
-      <p><span class="metadata">Study type:</span> {{ pkg.studyType }}</p>
-      <p><span class="metadata">Series information:</span> {{ pkg.seriesInformation }}</p>
-      <p><span class="metadata">ID number:</span> {{ pkg.idNumber }}</p>
+      <p><span class="fieldname">Study type:</span> {{ pkg.studyType }}</p>
+      <p><span class="fieldname">Series information:</span> {{ pkg.seriesInformation }}</p>
+      <p><span class="fieldname">ID number:</span> {{ pkg.idNumber }}</p>
     {% endblock %}
 
     {% block package_desc %}
-      <p><span class="metadata">Description:</span>{{ h.markdown_extract(pkg.description) }}</p>
+      <p><span class="fieldname">Description:</span>{{ h.markdown_extract(pkg.description) }}</p>
     {% endblock %}
   {% endblock %}
 

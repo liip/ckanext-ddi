@@ -1,165 +1,158 @@
-<section class="additional-info module-content">
-  <table class="table package-metadata">
+<section class="additional-info module-content" xmlns="http://www.w3.org/1999/html">
+  <table class="table package-version">
     <tr>
       <td>
-        <p class="heading">{{ _("Author") }}</p>
-        {% if pkg.author_email %}
-          <p class="metadata">{{ h.mail_to(email_address=pkg.author_email, name=pkg.author) }}</p>
-        {% elif pkg.author %}
-          <p class="metadata">{{ pkg.author }}</p>
+        <p class="fieldname">{{ _("Production date") }}</p>
+        {% if pkg.productionDate %}
+          <p class="metadata">{{ pkg.productionDate }}</p>
         {% endif %}
       </td>
       <td>
-        <p class="heading">{{ _("Date first published") }}</p>
-        {% if pkg.dateFirstPublished %}
-          {% set date = h.validate_date(pkg.dateFirstPublished) %}
-          {% if date %}
-            <p class="metadata">{{ date }}</p>
-          {% endif %}
+        <p class="fieldname">{{ _('Notes') }}</p>
+        {% if pkg.notes %}
+        <p class="metadata">{{ pkg.notes }}</p>
         {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="heading">{{ _('Maintainer') }}</p>
-        {% if pkg.maintainer_email %}
-          <p class="metadata">{{ h.mail_to(email_address=pkg.maintainer_email, name=pkg.maintainer) }}</p>
-        {% elif pkg.maintainer %}
-          <p class="metadata">{{ pkg.maintainer }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="heading">{{ _("Time range") }}</p>
-        {% if pkg.timeRange %}
-          <p class="metadata">{{ pkg.timeRange }}</p>
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="heading">{{ _("Data type") }}</p>
-        {% if pkg.dataType %}
-          <p class="metadata">{{ pkg.dataType[0] }}</p>
-        {% else %}
-          {% for extra in h.sorted_extras(pkg.extras) %}
-            {% set key, value = extra %}
-            {% if key == "dataType" and value %}
-              <p class="metadata">{{ value }}</p>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-      </td>
-      <td>
-        <p class="heading">{{ _('Date last updated')|safe }}</p>
-        {% if pkg.dateLastUpdated %}
-          {% set date = h.validate_date(pkg.dateLastUpdated) %}
-          {% if date %}
-            <p class="metadata">{{ date }}</p>
-          {% endif %}
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="heading">{{ _('Source') }}</p>
-        {% if pkg.url %}
-          <p class="metadata">{{ pkg.url }}</p>
-        {% else %}
-          <p class="metadata">{{ pkg.author }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="heading">{{ _("Version") }}</p>
-        {% if pkg.version %}
-          <p class="metadata">{{ pkg.version }}</p>
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="heading">{{ _("Spatial relationship") }}</p>
-        {% if pkg.spatialRelationship %}
-          <p class="metadata">{{ pkg.spatialRelationship }}</p>
-        {% endif %}
-      </td>
-      <td>
-        <p class="heading">{{ _("Update interval")|safe }}</p>
-        {% if pkg.updateInterval %}
-          <p class="metadata">{{ pkg.updateInterval[0] }}</p>
-        {% else %}
-          {% for extra in h.sorted_extras(pkg.extras) %}
-            {% set key, value = extra %}
-            {% if key == "updateInterval" and value %}
-              <p class="metadata">{{ value }}</p>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <p class="heading">{{ _("Legal information") }}</p>
-        {% if pkg.legalInformation %}
-          <p class="metadata">{{ pkg.legalInformation }}</p>
-        {% endif %}
-      </td>
-      <td>
       </td>
     </tr>
   </table>
 
-  {% if pkg.dataQuality %}
-    <div class="package-dataquality">
-    <h5>{{ _("Data quality") }}</h5>
-      {{ pkg.dataQuality }}
-    </div>
-  {% endif %}
+  <table class="table package-overview">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Kind of data") }}</p>
+        {% if pkg.kindOfData %}
+          <p class="metadata">{{ pkg.kindOfData }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="fieldname">{{ _("Unit of analysis") }}</p>
+        {% if pkg.unitOfAnalysis %}
+          <p class="metadata">{{ pkg.unitOfAnalysis }}</p>
+        {% endif %}
+      </td>
+    </tr>
 
-  {% set comments = [] %}
-  {% if pkg.sszBemerkungen %}
-    {% do comments.append(pkg.sszBemerkungen) %}
-  {% else %}
-    {% for extra in h.sorted_extras(pkg.extras) %}
-      {% set key, value = extra %}
-      {% if key == "sszBemerkungen" and value %}
-        {% do comments.append(value) %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-  {% if comments %}
-    <h3>{{ _("Comments") }}</h3>
-    <div class="package-comments">
-      {{ h.render_markdown(comments[0]) }}
-    </div>
-  {% endif %}
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Abstract") }}</p>
+        {% if pkg.abstract %}
+        <p class="metadata">{{ pkg.abstract }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
 
-  {% set attribs = [] %}
-  {% if pkg.sszFields %}
-    {% do attribs.append(pkg.sszFields) %}
-  {% else %}
-    {% for extra in h.sorted_extras(pkg.extras) %}
-      {% set key, value = extra %}
-      {% if key == "sszFields" and value %}
-        {% do attribs.append(value) %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-  {% if h.load_json(attribs[0]) %}
-    <h3>Attribute</h3>
-    <div class="package-attributes">
-      <table class="table table-striped table-bordered table-condensed">
-        <tbody>
-          {% for key, value in h.load_json(attribs[0]) %}
-            <tr><th>{{key}}</th></tr>
-            <tr><td>{{value}}</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
+  <table class="package-scope">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _('Description of scope')|safe }}</p>
+        {% if pkg.descriptionOfScope %}
+          <p class="metadata">{{ pkg.descriptionOfScope }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="package-coverage">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Country") }}</p>
+        {% if pkg.country %}
+          <p class="metadata">{{ pkg.country }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="fieldname">{{ _("Geographic coverage")|safe }}</p>
+        {% if pkg.geographicCoverage %}
+          <p class="metadata">{{ pkg.geographicCoverage }}</p>
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Universe") }}</p>
+        {% if pkg.universe %}
+          <p class="metadata">{{ pkg.universe }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="package-producers">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Primary investigator") }}</p>
+        {% if pkg.primaryInvestigator %}
+          <p class="metadata">{{ pkg.primaryInvestigator }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="fieldname">{{ _("Other producers")|safe }}</p>
+        {% if pkg.otherProducers %}
+          <p class="metadata">{{ pkg.otherProducers }}</p>
+        {% endif %}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Funding") }}</p>
+        {% if pkg.funding %}
+          <p class="metadata">{{ pkg.funding }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="package-sampling">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _('Sampling procedure')|safe }}</p>
+        {% if pkg.samplingProcedure %}
+          <p class="metadata">{{ pkg.samplingProcedure }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="package-data-collection">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _('Dates of data collection')|safe }}</p>
+        {% if pkg.datesOfDataCollection %}
+          <p class="metadata">{{ pkg.datesOfDataCollection }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="table package-data-appraisal">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _("Access authority") }}</p>
+        {% if pkg.accessAuthority %}
+          <p class="metadata">{{ pkg.accessAuthority }}</p>
+        {% endif %}
+      </td>
+      <td>
+        <p class="fieldname">{{ _('Citation requirement') }}</p>
+        {% if pkg.citationRequirement %}
+        <p class="metadata">{{ pkg.citationRequirement }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <table class="package-contacts">
+    <tr>
+      <td>
+        <p class="fieldname">{{ _('Contact persons')|safe }}</p>
+        {% if pkg.contactPersons %}
+          <p class="metadata">{{ pkg.contactPersons }}</p>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
 </section>

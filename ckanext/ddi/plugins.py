@@ -18,7 +18,6 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     plugins.implements(plugins.IConfigurer, inherit=False)
     plugins.implements(plugins.IDatasetForm, inherit=False)
-    plugins.implements(plugins.ITemplateHelpers, inherit=False)
 
     def update_config(self, config):
         pass
@@ -299,7 +298,7 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     def update_config(self, config):
         tk.add_template_directory(config, 'templates')
         tk.add_public_directory(config, 'public')
-        tk.add_resource('fanstatic', 'ddi')
+        tk.add_resource('fanstatic', 'ddi-theme')
 
     def get_helpers(self):
         return {}
