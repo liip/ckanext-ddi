@@ -2,6 +2,7 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
+import yaml
 
 
 class DdiHarvest(plugins.SingletonPlugin):
@@ -286,6 +287,8 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return schema
 
 
+
+
 class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     """
     Plugin containing the theme for ddi for
@@ -295,7 +298,10 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer, inherit=False)
     plugins.implements(plugins.ITemplateHelpers, inherit=False)
 
+    ddi_config = None
+
     def update_config(self, config):
+        self.ddi_config = yaml.load(config.get('ckanext.ddi.config_file'))
         tk.add_template_directory(config, 'templates')
         tk.add_public_directory(config, 'public')
 
@@ -313,6 +319,7 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return []
 
     def setup_template_variables(self, context, data_dict):
+        context['ddi_config'] = self.ddi_config 
         return super(DdiTheme, self).setup_template_variables(
             context, data_dict
         )
