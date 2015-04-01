@@ -10,12 +10,92 @@ from pylons import config
 log = logging.getLogger(__name__)
 
 
-
 class DdiHarvest(plugins.SingletonPlugin):
     """
     Plugin containing the harvester for ddi for
     the World Bank
     """
+
+
+def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
+    class OrderedLoader(Loader):
+        pass
+
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    return yaml.load(stream, OrderedLoader)
+
+
+def get_ddi_config():
+    with open(config.get('ckanext.ddi.config_file')) as config_file:
+        ddi_config = ordered_load(config_file)
+    return ddi_config
+
+
+def create_vocabularies():
+    """
+    Create vocabularies from config, if they don't exist already
+    """
+    user = tk.get_action('get_site_user')({'ignore_auth': True}, {})
+    context = {'user': user['name']}
+    vocabularies = get_ddi_config()['vocabularies']
+
+    for vocab in vocabularies:
+        try:
+            data = {'id': vocab}
+            tk.get_action('vocabulary_show')(context, data)
+            logging.info('Vocabulary ' + vocab + ' already exists')
+        except tk.ObjectNotFound:
+            logging.info('Creating vocabulary ' + vocab)
+            data = {'name': vocab}
+            new_vocab = tk.get_action('vocabulary_create')(context, data)
+            # Add a blank value to the list of values in the vocabulary
+            vocabularies[vocab].append('    ')
+
+            for tag in vocabularies[vocab]:
+                logging.info(
+                    "Adding tag {0} to vocab 'updateInterval'".format(tag))
+                data = {'name': tag, 'vocabulary_id': new_vocab['id']}
+                tk.get_action('tag_create')(context, data)
+
+
+def get_vocabulary(vocabulary):
+    try:
+        return tk.get_action('tag_list')(data_dict={'vocabulary_id': vocabulary})
+    except tk.ObjectNotFound:
+        logging.info('Could not get tags for vocabulary ' + vocabulary)
+
+        return None
+
+
+def get_vocabulary_values(package_dict):
+    results = {}
+    extras = package_dict['extras']
+    vocabularies = get_ddi_config()['vocabularies']
+
+    for vocab in vocabularies:
+        results[vocab] = '    '
+
+    try:
+        for extra in extras:
+            for vocab in vocabularies:
+                if extra['key'] == vocab:
+                    results[vocab] = extra['value']
+
+        return results
+
+    except KeyError:
+        return results
+
+
+def get_package_dict(dataset_id):
+    user = tk.get_action('get_site_user')({}, {})
+    context = {'user': user['name']}
+    return tk.get_action('package_show')(context, {'id': dataset_id})
 
 
 class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
@@ -43,130 +123,32 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return []
 
     def _modify_package_schema(self, schema):
-        # Add new fields as extras
-        # Identification fields
-        schema.update({
-            'abbreviation': [tk.get_validator('ignore_missing'),
-                             tk.get_converter('convert_to_extras')]
-        })
+        # Add new fields from the config as extras
+        fields = get_ddi_config()['fields']
 
-        schema.update({
-            'study_type': [tk.get_validator('ignore_missing'),
-                          tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'series_information': [tk.get_validator('ignore_missing'),
-                                  tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'id_number': [tk.get_validator('ignore_missing'),
-                         tk.get_converter('convert_to_extras')]
-        })
-
-        # Version fields
-        schema.update({
-            'production_date': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'description': [tk.get_validator('ignore_missing'),
-                      tk.get_converter('convert_to_extras')]
-        })
-
-        # Overview fields
-        schema.update({
-            'abstract': [tk.get_validator('ignore_missing'),
-                         tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'kind_of_data': [tk.get_validator('ignore_missing'),
-                           tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'unit_of_analysis': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
-
-        # Scope fields
-        schema.update({
-            'description_of_scope': [tk.get_validator('ignore_missing'),
-                                   tk.get_converter('convert_to_extras')]
-        })
-
-        # Coverage fields
-        schema.update({
-            'country': [tk.get_validator('ignore_missing'),
-                        tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'geographic_coverage': [tk.get_validator('ignore_missing'),
-                                   tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'universe': [tk.get_validator('ignore_missing'),
-                         tk.get_converter('convert_to_extras')]
-        })
-
-        # Producers and Sponsors fields
-        schema.update({
-            'primary_investigator': [tk.get_validator('ignore_missing'),
-                                    tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'other_producers': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'funding': [tk.get_validator('ignore_missing'),
-                        tk.get_converter('convert_to_extras')]
-        })
-
-        # Sampling fields
-        schema.update({
-            'sampling_procedure': [tk.get_validator('ignore_missing'),
-                                  tk.get_converter('convert_to_extras')]
-        })
-
-        # Data Collection fields
-        schema.update({
-            'data_collection_dates': [tk.get_validator('ignore_missing'),
-                                      tk.get_converter('convert_to_extras')]
-        })
-
-        # Data Appraisal fields
-        schema.update({
-            'access_authority': [tk.get_validator('ignore_missing'),
-                                tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'citation_requirement': [tk.get_validator('ignore_missing'),
-                                    tk.get_converter('convert_to_extras')]
-        })
-
-        # Contacts fields
-        schema.update({
-            'contact_persons': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
+        for section in fields:
+            for field in section:
+                if field['type'] == 'vocabulary':
+                    schema.update({
+                        field: [tk.get_validator('ignore_missing'),
+                                         tk.get_converter('convert_to_tags')(field)]
+                    })
+                else:
+                    schema.update({
+                        field: [tk.get_validator('ignore_missing'),
+                                         tk.get_converter('convert_to_extras')]
+                    })
 
         return schema
 
     def create_package_schema(self):
+        create_vocabularies()
         schema = super(DdiSchema, self).create_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
 
     def update_package_schema(self):
+        create_vocabularies()
         schema = super(DdiSchema, self).update_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
@@ -178,144 +160,28 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # (e.g. on dataset pages, or on the search page)
         schema['tags']['__extras'].append(tk.get_converter('free_tags_only'))
 
-        # Add new fields to the dataset schema.
-        # Identification fields
-        schema.update({
-            'study_type': [tk.get_converter('convert_from_extras'),
-                          tk.get_validator('ignore_missing')]
-        })
+        # Add new fields from the config to the dataset schema.
+        fields = get_ddi_config()['fields']
 
-        schema.update({
-            'series_information': [tk.get_converter('convert_from_extras'),
-                                  tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'id_number': [tk.get_converter('convert_from_extras'),
-                         tk.get_validator('ignore_missing')]
-        })
-
-        # Version fields
-
-        schema.update({
-            'production_date': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'description': [tk.get_converter('convert_from_extras'),
-                      tk.get_validator('ignore_missing')]
-        })
-
-        # Overview fields
-        schema.update({
-            'abstract': [tk.get_converter('convert_from_extras'),
-                         tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'kind_of_data': [tk.get_converter('convert_from_extras'),
-                           tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'unit_of_analysis': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
-
-        # Scope fields
-
-        schema.update({
-            'description_of_scope': [tk.get_converter('convert_from_extras'),
-                                   tk.get_validator('ignore_missing')]
-        })
-
-        # Coverage fields
-        schema.update({
-            'country': [tk.get_converter('convert_from_extras'),
-                        tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'geographic_coverage': [tk.get_converter('convert_from_extras'),
-                                   tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'universe': [tk.get_converter('convert_from_extras'),
-                         tk.get_validator('ignore_missing')]
-        })
-
-        # Producers and Sponsors fields
-        schema.update({
-            'primary_investigator': [tk.get_converter('convert_from_extras'),
-                                    tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'other_producers': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'funding': [tk.get_converter('convert_from_extras'),
-                        tk.get_validator('ignore_missing')]
-        })
-
-        # Sampling fields
-        schema.update({
-            'sampling_procedure': [tk.get_converter('convert_from_extras'),
-                                  tk.get_validator('ignore_missing')]
-        })
-
-        # Data Collection fields
-        schema.update({
-            'data_collection_dates': [tk.get_converter('convert_from_extras'),
-                                      tk.get_validator('ignore_missing')]
-        })
-        # Data Appraisal fields
-        schema.update({
-            'access_authority': [tk.get_converter('convert_from_extras'),
+        for section in fields:
+            for field in section:
+                if field['type'] == 'vocabulary':
+                    schema.update({
+                        field: [tk.get_converter('convert_from_tags')(field),
                                 tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'citation_requirement': [tk.get_converter('convert_from_extras'),
-                                    tk.get_validator('ignore_missing')]
-        })
-
-        # Contacts fields
-        schema.update({
-            'contact_persons': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
+                    })
+                else:
+                    schema.update({
+                        field: [tk.get_converter('convert_from_extras'),
+                                tk.get_validator('ignore_missing')]
+                    })
 
         return schema
 
 
-def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
-    class OrderedLoader(Loader):
-        pass
-
-    def construct_mapping(loader, node):
-        loader.flatten_mapping(node)
-        return object_pairs_hook(loader.construct_pairs(node))
-    OrderedLoader.add_constructor(
-        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-        construct_mapping)
-    return yaml.load(stream, OrderedLoader)
-
-
-def get_ddi_config():
-    with open(config.get('ckanext.ddi.config_file')) as config_file: 
-        ddi_config = ordered_load(config_file)
-    return ddi_config
-
-
 class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     """
-    Plugin containing the theme for ddi for
-    the World Bank
+    Plugin containing the theme for ddi for the World Bank
     """
 
     plugins.implements(plugins.IConfigurer, inherit=False)
@@ -332,7 +198,12 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def get_helpers(self):
         log.debug("get_helpers")
-        return {'ddi_theme_get_ddi_config': get_ddi_config }
+        return {
+            'ddi_theme_get_ddi_config': get_ddi_config,
+            'ddi_theme_get_vocabulary': get_vocabulary,
+            'ddi_theme_get_vocabulary_values': get_vocabulary_values,
+            'ddi_theme_get_package_dict': get_package_dict
+        }
 
     def is_fallback(self):
         # Return True to register this plugin as the default handler for

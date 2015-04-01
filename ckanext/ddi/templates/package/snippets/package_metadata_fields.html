@@ -1,5 +1,5 @@
 {% import 'macros/form.html' as form %}
-{% set p = h.get_package_dict(data.id) %}
+{% set p = h.ddi_theme_get_package_dict(data.id) %}
 
 {% block package_metadata_fields %}
 
@@ -12,6 +12,31 @@
 {% block package_overview_fields_kindOfData %}
   {{ form.input('kind_of_data', id='field-kind_of_data', label=_('Kind of data'), placeholder=_('Kind of data'), value=data.kind_of_data, error=errors.kind_of_data, classes=['control-full']) }}
 {% endblock %}
+
+Vocabulary: {{ h.ddi_theme_get_vocabulary('kind_of_data') }}
+package_dict: {{ p }}
+Value: {{ h.ddi_theme_get_vocabulary_values(p)['kind_of_data'] }}
+
+<div class="control-group">
+  <label class="control-label" for="field-kind_of_data">{{ _("Kind of Data") }}</label>
+  <div class="controls">
+    <select id="field-kind_of_data" name="kind_of_data" data-module="autocomplete">
+      {% for interval in h.ddi_theme_get_vocabulary('kind_of_data') %}
+      <option value="{{ interval }}"
+
+      {% if data.kind_of_data %}
+        {% if interval == data.kind_of_data[0] %}
+          selected="selected"
+        {% endif %}
+      {% elif interval == h.ddi_theme_get_vocabulary_values(p)['kind_of_data'] %}
+        selected="selected"
+      {% endif %}
+
+      >{{ interval }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
 
 {% block package_overview_fields_unit_of_analysis %}
   {{ form.input('unit_of_analysis', id='field-unit_of_analysis', label=_('Unit of analysis'), placeholder=_('Unit of analysis'), value=data.unit_of_analysis, error=errors.unit_of_analysis, classes=['control-full']) }}
