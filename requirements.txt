@@ -1,3 +1,4 @@
 # This file lists the dependencies of this extension.
 # Install with a command like: pip install -r requirements.txt 
 lxml==2.2.4
+pyyaml==3.11
