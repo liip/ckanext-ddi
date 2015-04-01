@@ -5,6 +5,8 @@
 {% block primary_content_inner %}
   {{ super() }}
   {% block package_description %}
+    DDI:
+    {{ h.ddi_theme_get_ddi_config() }}
     {% if pkg.private %}
       <span class="dataset-private label label-inverse pull-right">
         <i class="icon-lock"></i>

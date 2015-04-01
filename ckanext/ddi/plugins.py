@@ -4,6 +4,11 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 import yaml
 
+import logging
+from pylons import config
+log = logging.getLogger(__name__)
+
+
 
 class DdiHarvest(plugins.SingletonPlugin):
     """
@@ -288,6 +293,11 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
 
 
+def get_ddi_config():
+    with open(config.get('ckanext.ddi.config_file')) as config_file: 
+        ddi_config = yaml.load(config_file)
+    return ddi_config
+
 
 class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     """
@@ -304,14 +314,16 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         self.ddi_config = yaml.load(config.get('ckanext.ddi.config_file'))
         tk.add_template_directory(config, 'templates')
         tk.add_public_directory(config, 'public')
+        log.debug("update config")
 
     def get_helpers(self):
-        return {}
+        log.debug("get_helpers")
+        return {'ddi_theme_get_ddi_config': get_ddi_config }
 
     def is_fallback(self):
         # Return True to register this plugin as the default handler for
         # package types not handled by any other IDatasetForm plugin.
-        return True
+        return False
 
     def package_types(self):
         # This plugin doesn't handle any special package types, it just
