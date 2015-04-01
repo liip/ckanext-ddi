@@ -51,23 +51,23 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         })
 
         schema.update({
-            'studyType': [tk.get_validator('ignore_missing'),
+            'study_type': [tk.get_validator('ignore_missing'),
                           tk.get_converter('convert_to_extras')]
         })
 
         schema.update({
-            'seriesInformation': [tk.get_validator('ignore_missing'),
+            'series_information': [tk.get_validator('ignore_missing'),
                                   tk.get_converter('convert_to_extras')]
         })
 
         schema.update({
-            'idNumber': [tk.get_validator('ignore_missing'),
+            'id_number': [tk.get_validator('ignore_missing'),
                          tk.get_converter('convert_to_extras')]
         })
 
         # Version fields
         schema.update({
-            'productionDate': [tk.get_validator('ignore_missing'),
+            'production_date': [tk.get_validator('ignore_missing'),
                                tk.get_converter('convert_to_extras')]
         })
 
@@ -83,18 +83,18 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         })
 
         schema.update({
-            'kindOfData': [tk.get_validator('ignore_missing'),
+            'kind_of_data': [tk.get_validator('ignore_missing'),
                            tk.get_converter('convert_to_extras')]
         })
 
         schema.update({
-            'unitOfAnalysis': [tk.get_validator('ignore_missing'),
+            'unit_of_analysis': [tk.get_validator('ignore_missing'),
                                tk.get_converter('convert_to_extras')]
         })
 
         # Scope fields
         schema.update({
-            'descriptionOfScope': [tk.get_validator('ignore_missing'),
+            'description_of_scope': [tk.get_validator('ignore_missing'),
                                    tk.get_converter('convert_to_extras')]
         })
 
@@ -105,7 +105,7 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         })
 
         schema.update({
-            'geographicCoverage': [tk.get_validator('ignore_missing'),
+            'geographic_coverage': [tk.get_validator('ignore_missing'),
                                    tk.get_converter('convert_to_extras')]
         })
 
@@ -116,12 +116,12 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         # Producers and Sponsors fields
         schema.update({
-            'primaryInvestigator': [tk.get_validator('ignore_missing'),
+            'primary_investigator': [tk.get_validator('ignore_missing'),
                                     tk.get_converter('convert_to_extras')]
         })
 
         schema.update({
-            'otherProducers': [tk.get_validator('ignore_missing'),
+            'other_producers': [tk.get_validator('ignore_missing'),
                                tk.get_converter('convert_to_extras')]
         })
 
@@ -132,30 +132,30 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         # Sampling fields
         schema.update({
-            'samplingProcedure': [tk.get_validator('ignore_missing'),
+            'sampling_procedure': [tk.get_validator('ignore_missing'),
                                   tk.get_converter('convert_to_extras')]
         })
 
         # Data Collection fields
         schema.update({
-            'datesOfDataCollection': [tk.get_validator('ignore_missing'),
+            'data_collection_dates': [tk.get_validator('ignore_missing'),
                                       tk.get_converter('convert_to_extras')]
         })
 
         # Data Appraisal fields
         schema.update({
-            'accessAuthority': [tk.get_validator('ignore_missing'),
+            'access_authority': [tk.get_validator('ignore_missing'),
                                 tk.get_converter('convert_to_extras')]
         })
 
         schema.update({
-            'citationRequirement': [tk.get_validator('ignore_missing'),
+            'citation_requirement': [tk.get_validator('ignore_missing'),
                                     tk.get_converter('convert_to_extras')]
         })
 
         # Contacts fields
         schema.update({
-            'contactPersons': [tk.get_validator('ignore_missing'),
+            'contact_persons': [tk.get_validator('ignore_missing'),
                                tk.get_converter('convert_to_extras')]
         })
 
@@ -181,24 +181,24 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # Add new fields to the dataset schema.
         # Identification fields
         schema.update({
-            'studyType': [tk.get_converter('convert_from_extras'),
+            'study_type': [tk.get_converter('convert_from_extras'),
                           tk.get_validator('ignore_missing')]
         })
 
         schema.update({
-            'seriesInformation': [tk.get_converter('convert_from_extras'),
+            'series_information': [tk.get_converter('convert_from_extras'),
                                   tk.get_validator('ignore_missing')]
         })
 
         schema.update({
-            'idNumber': [tk.get_converter('convert_from_extras'),
+            'id_number': [tk.get_converter('convert_from_extras'),
                          tk.get_validator('ignore_missing')]
         })
 
         # Version fields
 
         schema.update({
-            'productionDate': [tk.get_converter('convert_from_extras'),
+            'production_date': [tk.get_converter('convert_from_extras'),
                                tk.get_validator('ignore_missing')]
         })
 
@@ -214,19 +214,19 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         })
 
         schema.update({
-            'kindOfData': [tk.get_converter('convert_from_extras'),
+            'kind_of_data': [tk.get_converter('convert_from_extras'),
                            tk.get_validator('ignore_missing')]
         })
 
         schema.update({
-            'unitOfAnalysis': [tk.get_converter('convert_from_extras'),
+            'unit_of_analysis': [tk.get_converter('convert_from_extras'),
                                tk.get_validator('ignore_missing')]
         })
 
         # Scope fields
 
         schema.update({
-            'descriptionOfScope': [tk.get_converter('convert_from_extras'),
+            'description_of_scope': [tk.get_converter('convert_from_extras'),
                                    tk.get_validator('ignore_missing')]
         })
 
@@ -237,7 +237,7 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         })
 
         schema.update({
-            'geographicCoverage': [tk.get_converter('convert_from_extras'),
+            'geographic_coverage': [tk.get_converter('convert_from_extras'),
                                    tk.get_validator('ignore_missing')]
         })
 
@@ -248,12 +248,12 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         # Producers and Sponsors fields
         schema.update({
-            'primaryInvestigator': [tk.get_converter('convert_from_extras'),
+            'primary_investigator': [tk.get_converter('convert_from_extras'),
                                     tk.get_validator('ignore_missing')]
         })
 
         schema.update({
-            'otherProducers': [tk.get_converter('convert_from_extras'),
+            'other_producers': [tk.get_converter('convert_from_extras'),
                                tk.get_validator('ignore_missing')]
         })
 
@@ -264,29 +264,29 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         # Sampling fields
         schema.update({
-            'samplingProcedure': [tk.get_converter('convert_from_extras'),
+            'sampling_procedure': [tk.get_converter('convert_from_extras'),
                                   tk.get_validator('ignore_missing')]
         })
 
         # Data Collection fields
         schema.update({
-            'datesOfDataCollection': [tk.get_converter('convert_from_extras'),
+            'data_collection_dates': [tk.get_converter('convert_from_extras'),
                                       tk.get_validator('ignore_missing')]
         })
         # Data Appraisal fields
         schema.update({
-            'accessAuthority': [tk.get_converter('convert_from_extras'),
+            'access_authority': [tk.get_converter('convert_from_extras'),
                                 tk.get_validator('ignore_missing')]
         })
 
         schema.update({
-            'citationRequirement': [tk.get_converter('convert_from_extras'),
+            'citation_requirement': [tk.get_converter('convert_from_extras'),
                                     tk.get_validator('ignore_missing')]
         })
 
         # Contacts fields
         schema.update({
-            'contactPersons': [tk.get_converter('convert_from_extras'),
+            'contact_persons': [tk.get_converter('convert_from_extras'),
                                tk.get_validator('ignore_missing')]
         })
 
@@ -320,6 +320,7 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     plugins.implements(plugins.IConfigurer, inherit=False)
     plugins.implements(plugins.ITemplateHelpers, inherit=False)
+    plugins.implements(plugins.IDatasetForm, inherit=False)
 
     ddi_config = None
 

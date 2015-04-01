@@ -1,143 +1,23 @@
- <h3>{{ _('Additional Info') }}</h3>
+{% set ddi_config = h.ddi_theme_get_ddi_config() %}
 
 <section class="additional-info module-content" xmlns="http://www.w3.org/1999/html">
-  <table class="table package-version">
-      {% if pkg.productionDate %}
+  {% for section in ddi_config['fields'] %}
+    <table class="table package-{{section}}">
         <tr>
-          <td>
-          <p class="fieldname">{{ _("Production date") }}</p>
-          <p class="metadata">{{ pkg.productionDate }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.notes %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _('Notes') }}</p>
-          <p class="metadata">{{ h.render_markdown(pkg.notes) }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.kindOfData %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Kind of data") }}</p>
-          <p class="metadata">{{ pkg.kindOfData }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.unitOfAnalysis %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Unit of analysis") }}</p>
-          <p class="metadata">{{ pkg.unitOfAnalysis }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.abstract %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Abstract") }}</p>
-          <p class="metadata">{{ h.render_markdown(pkg.abstract) }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.descriptionOfScope %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _('Description of scope')|safe }}</p>
-          <p class="metadata">{{ h.render_markdown(pkg.descriptionOfScope) }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.country %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Country") }}</p>
-          <p class="metadata">{{ pkg.country }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.geographicCoverage %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Geographic coverage")|safe }}</p>
-          <p class="metadata">{{ pkg.geographicCoverage }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.universe %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Universe") }}</p>
-          <p class="metadata">{{ pkg.universe }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.primaryInvestigator %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Primary investigator") }}</p>
-          <p class="metadata">{{ pkg.primaryInvestigator }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.otherProducers %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Other producers")|safe }}</p>
-          <p class="metadata">{{ pkg.otherProducers }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.funding %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Funding") }}</p>
-          <p class="metadata">{{ pkg.funding }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.samplingProcedure %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _('Sampling procedure')|safe }}</p>
-          <p class="metadata">{{ h.render_markdown(pkg.samplingProcedure) }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.datesOfDataCollection %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _('Dates of data collection')|safe }}</p>
-          <p class="metadata">{{ pkg.datesOfDataCollection }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.accessAuthority %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _("Access authority") }}</p>
-          <p class="metadata">{{ pkg.accessAuthority }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.citationRequirement %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _('Citation requirement') }}</p>
-          <p class="metadata">{{ pkg.citationRequirement }}</p>
-          </td>
-        <tr>
-      {% endif %}
-      {% if pkg.contactPersons %}
-        <tr>
-          <td>
-          <p class="fieldname">{{ _('Contact persons')|safe }}</p>
-          <p class="metadata">{{ pkg.contactPersons }}</p>
-          </td>
-        <tr>
-      {% endif %}
-  </table>
-
+            <h3>{{ ddi_config['sections'][section] }}</h3>
+        </tr>
+        {% for field in ddi_config['fields'][section] %}
+          {% if field in pkg and ddi_config['fields'][section][field]['visible'] %}
+            <tr>
+              <td>
+              <p class="fieldname">{{ _(ddi_config['fields'][section][field]['display']) }}</p>
+              </td>
+              <td>
+              <p class="metadata">{{ pkg[field] }}</p>
+              </td>
+            <tr>
+          {% endif %}
+        {% endfor %}
+    </table>
+  {% endfor %}
 </section>
