@@ -31,5 +31,6 @@ setup(
     ddi_schema=ckanext.ddi.plugins:DdiSchema
     [paste.paster_command]
     harvester=ckanext.ddi.commands.harvester:Harvester
+    ddi=ckanext.ddi.commands.ddi:DdiCommand
     """,
 )

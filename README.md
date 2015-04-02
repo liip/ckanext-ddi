@@ -12,6 +12,15 @@ Planned Features:
 * Upload DDI files (XML) to a CKAN instance
 * Provide data from CKAN as DDI
 
+## Usage
+
+This plugin provides the possibility to import DDI XML files using a paster command.
+The file can either be loaded from a local path or a publicly available URL.
+
+```bash
+paster --plugin=ckanext-ddi import <path_or_url> -c <path to config file>
+```
+
 ## Installation
 
 Use `pip` to install this plugin. This example installs it in `/home/www-data`
