@@ -7,7 +7,7 @@
             <h3>{{ ddi_config['sections'][section] }}</h3>
         </tr>
         {% for field in ddi_config['fields'][section] %}
-          {% if field in pkg and ddi_config['fields'][section][field]['visible'] %}
+          {% if ddi_config['fields'][section][field]['visible'] and field in pkg and pkg[field] %}
             <tr>
               <td>
               <p class="fieldname">{{ _(ddi_config['fields'][section][field]['display']) }}</p>

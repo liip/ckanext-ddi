@@ -74,21 +74,22 @@ def get_vocabulary(vocabulary):
 
 def get_vocabulary_values(package_dict):
     results = {}
-    extras = package_dict['extras']
     vocabularies = get_ddi_config()['vocabularies']
 
     for vocab in vocabularies:
-        results[vocab] = '    '
+        results[vocab] = ['    ']
 
     try:
+        extras = package_dict['extras']
         for extra in extras:
             for vocab in vocabularies:
                 if extra['key'] == vocab:
-                    results[vocab] = extra['value']
+                    results[vocab].append(extra['value'])
 
         return results
 
-    except KeyError:
+    except KeyError as e:
+        logging.info(e)
         return results
 
 
@@ -128,27 +129,19 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         for section in fields:
             for field in section:
-                if field['type'] == 'vocabulary':
-                    schema.update({
-                        field: [tk.get_validator('ignore_missing'),
-                                         tk.get_converter('convert_to_tags')(field)]
-                    })
-                else:
-                    schema.update({
-                        field: [tk.get_validator('ignore_missing'),
-                                         tk.get_converter('convert_to_extras')]
-                    })
+                schema.update({
+                    field: [tk.get_validator('ignore_missing'),
+                                     tk.get_converter('convert_to_extras')]
+                })
 
         return schema
 
     def create_package_schema(self):
-        create_vocabularies()
         schema = super(DdiSchema, self).create_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
 
     def update_package_schema(self):
-        create_vocabularies()
         schema = super(DdiSchema, self).update_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
@@ -165,16 +158,10 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         for section in fields:
             for field in section:
-                if field['type'] == 'vocabulary':
-                    schema.update({
-                        field: [tk.get_converter('convert_from_tags')(field),
-                                tk.get_validator('ignore_missing')]
-                    })
-                else:
-                    schema.update({
-                        field: [tk.get_converter('convert_from_extras'),
-                                tk.get_validator('ignore_missing')]
-                    })
+                schema.update({
+                    field: [tk.get_converter('convert_from_extras'),
+                            tk.get_validator('ignore_missing')]
+                })
 
         return schema
 

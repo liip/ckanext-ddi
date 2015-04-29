@@ -15,32 +15,6 @@
   {{ form.prepend('name', id='field-name', label=_('URL'), prepend=prefix, placeholder=_('eg. my-dataset'), value=data.name, error=errors.name, attrs=attrs, is_required=true) }}
 {% endblock %}
 
-{% block package_identification_fields_study_type %}
-  {{ form.input('studyType', id='field-studyType', label=_('Study type'), placeholder=_('eg. The type of study'), value=data.studyType, error=errors.studyType, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_identification_fields_series_information %}
-  {{ form.input('seriesInformation', id='field-seriesInformation', label=_('Series information'), placeholder=_('eg. The series information'), value=data.seriesInformation, error=errors.seriesInformation, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_identification_fields_id_number %}
-  {{ form.input('idNumber', id='field-idNumber', label=_('ID number'), placeholder=_('eg. The ID number'), value=data.idNumber, error=errors.idNumber, classes=['control-full']) }}
-{% endblock %}
-
-{# Version #}
-
-{% block package_version_fields_description %}
-  {{ form.markdown('description', id='field-description', label=_('Description'), placeholder=_('eg. A description of the data'), value=data.description, error=errors.description) }}
-{% endblock %}
-
-{% block package_version_fields_production_date %}
-  {{ form.input('productionDate', id='field-productionDate', label=_('Production date'), placeholder=_('eg. The production date'), value=data.productionDate, error=errors.productionDate, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_version_fields_notes %}
-  {{ form.markdown('notes', id='field-notes', label=_('Notes'), placeholder=_('eg. Some useful notes about the data'), value=data.notes, error=errors.notes) }}
-{% endblock %}
-
 {% block package_basic_fields_tags %}
   {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
   {{ form.input('tag_string', id='field-tags', label=_('Tags'), placeholder=_('eg. economy, mental health, government'), value=data.tag_string, error=errors.tags, classes=['control-full'], attrs=tag_attrs) }}

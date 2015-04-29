@@ -18,7 +18,7 @@ This plugin provides the possibility to import DDI XML files using a paster comm
 The file can either be loaded from a local path or a publicly available URL.
 
 ```bash
-paster --plugin=ckanext-ddi import <path_or_url> -c <path to config file>
+paster --plugin=ckanext-ddi ddi import <path_or_url> -c <path to config file>
 ```
 
 ## Installation

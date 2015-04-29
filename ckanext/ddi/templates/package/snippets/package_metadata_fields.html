@@ -1,107 +1,21 @@
 {% import 'macros/form.html' as form %}
-{% set p = h.ddi_theme_get_package_dict(data.id) %}
+{% set pkg = h.ddi_theme_get_package_dict(data.id) %}
+{% set ddi_config = h.ddi_theme_get_ddi_config() %}
 
 {% block package_metadata_fields %}
 
-{# Overview #}
+{{ pkg }}
 
-{% block package_overview_fields_abstract %}
-  {{ form.markdown('abstract', id='field-abstract', label=_('Abstract'), placeholder=_('Abstract'), value=data.abstract, error=errors.studyType, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_overview_fields_kindOfData %}
-  {{ form.input('kind_of_data', id='field-kind_of_data', label=_('Kind of data'), placeholder=_('Kind of data'), value=data.kind_of_data, error=errors.kind_of_data, classes=['control-full']) }}
-{% endblock %}
-
-Vocabulary: {{ h.ddi_theme_get_vocabulary('kind_of_data') }}
-package_dict: {{ p }}
-Value: {{ h.ddi_theme_get_vocabulary_values(p)['kind_of_data'] }}
-
-<div class="control-group">
-  <label class="control-label" for="field-kind_of_data">{{ _("Kind of Data") }}</label>
-  <div class="controls">
-    <select id="field-kind_of_data" name="kind_of_data" data-module="autocomplete">
-      {% for interval in h.ddi_theme_get_vocabulary('kind_of_data') %}
-      <option value="{{ interval }}"
-
-      {% if data.kind_of_data %}
-        {% if interval == data.kind_of_data[0] %}
-          selected="selected"
-        {% endif %}
-      {% elif interval == h.ddi_theme_get_vocabulary_values(p)['kind_of_data'] %}
-        selected="selected"
-      {% endif %}
-
-      >{{ interval }}</option>
-      {% endfor %}
-    </select>
-  </div>
-</div>
-
-{% block package_overview_fields_unit_of_analysis %}
-  {{ form.input('unit_of_analysis', id='field-unit_of_analysis', label=_('Unit of analysis'), placeholder=_('Unit of analysis'), value=data.unit_of_analysis, error=errors.unit_of_analysis, classes=['control-full']) }}
-{% endblock %}
-
-{# Scope #}
-
-{% block package_scope_fields_description_of_scope %}
-  {{ form.markdown('description_of_scope', id='field-description_of_scope', label=_('Description of scope'), placeholder=_('description_of_scope'), value=data.description_of_scope, error=errors.description_of_scope, classes=['control-full']) }}
-{% endblock %}
-
-{# Coverage #}
-
-{% block package_scope_fields_country %}
-  {{ form.input('country', id='field-country', label=_('Country'), placeholder=_('Country'), value=data.country, error=errors.country, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_scope_fields_geographic_coverage %}
-  {{ form.input('geographic_coverage', id='field-geographic_coverage', label=_('Geographic coverage'), placeholder=_('geographic_coverage'), value=data.geographic_coverage, error=errors.geographic_coverage, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_scope_fields_universe %}
-  {{ form.input('universe', id='field-universe', label=_('Universe'), placeholder=_('Universe'), value=data.universe, error=errors.universe, classes=['control-full']) }}
-{% endblock %}
-
-{# Producers and Sponsors #}
-
-{% block package_producers_fields_primary_investigator %}
-  {{ form.input('primary_investigator', id='field-primary_investigator', label=_('Primary investigator'), placeholder=_('primary_investigator'), value=data.primary_investigator, error=errors.primary_investigator, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_producers_fields_other_producers %}
-  {{ form.input('other_producers', id='field-other_producers', label=_('Other producers'), placeholder=_('Other producers'), value=data.other_producers, error=errors.other_producers, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_producers_fields_funding %}
-  {{ form.input('funding', id='field-funding', label=_('Funding'), placeholder=_('Funding'), value=data.funding, error=errors.funding, classes=['control-full']) }}
-{% endblock %}
-
-{# Sampling #}
-
-{% block package_sampling_fields_sampling_procedure %}
-  {{ form.markdown('sampling_procedure', id='field-sampling_procedure', label=_('Sampling procedure'), placeholder=_('Sampling procedure'), value=data.sampling_procedure, error=errors.sampling_procedure, classes=['control-full']) }}
-{% endblock %}
-
-{# Data Collection #}
-
-{% block package_data_collection_fields_data_collection_dates %}
-  {{ form.input('data_collection_dates', id='field-data_collection_dates', label=_('Dates of data collection'), placeholder=_('Dates of data collection'), value=data.data_collection_dates, error=errors.data_collection_dates, classes=['control-full']) }}
-{% endblock %}
-
-{# Data Appraisal #}
-
-{% block package_data_appraisal_fields_access_authority %}
-{{ form.input('access_authority', id='field-access_authority', label=_('Access authority'), placeholder=_('Access authority'), value=data.access_authority, error=errors.access_authority, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_data_appraisal_fields_citation_requirement %}
-{{ form.input('citation_requirement', id='field-citation_requirement', label=_('Citation requirement'), placeholder=_('Citation requirement'), value=data.citation_requirement, error=errors.citation_requirement, classes=['control-full']) }}
-{% endblock %}
-
-{# Contacts #}
-
-{% block package_contacts_fields_contact_persons %}
-  {{ form.input('contact_persons', id='field-contact_persons', label=_('Contact persons'), placeholder=_('Contact persons'), value=data.contact_persons, error=errors.contact_persons, classes=['control-full']) }}
-{% endblock %}
+{% for section in ddi_config['fields'] %}
+  {% for field in ddi_config['fields'][section] %}
+    {% if ddi_config['fields'][section][field]['type'] == 'markdown' %}
+      {{ form.markdown(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data.field, error=errors.field, classes=['control-full']) }}
+    {% elif ddi_config['fields'][section][field]['type'] == 'text' %}
+      {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data.field, error=errors.field, classes=['control-full']) }}
+    {% elif ddi_config['fields'][section][field]['type'] == 'vocabulary' %}
+      {{ ddi_config['vocabularies'][field] }}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
 
 {% endblock %}
