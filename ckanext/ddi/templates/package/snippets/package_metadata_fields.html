@@ -12,7 +12,7 @@
       {% elif ddi_config['fields'][section][field]['type'] == 'text' %}
         {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
       {% elif ddi_config['fields'][section][field]['type'] == 'vocabulary' %}
-        {% set options = ddi_config['vocabularies'][field] %}
+        {% set options = ['    '] + ddi_config['vocabularies'][field] %}
 
         <div class="control-group">
           {% set error = errors.field %}
