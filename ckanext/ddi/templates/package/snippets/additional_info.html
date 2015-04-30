@@ -1,5 +1,7 @@
 {% set ddi_config = h.ddi_theme_get_ddi_config() %}
 
+{{ pkg }}
+
 <section class="additional-info module-content" xmlns="http://www.w3.org/1999/html">
   {% for section in ddi_config['fields'] %}
     <table class="table package-{{section}}">

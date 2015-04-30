@@ -128,20 +128,28 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         fields = get_ddi_config()['fields']
 
         for section in fields:
-            for field in section:
-                schema.update({
-                    field: [tk.get_validator('ignore_missing'),
-                                     tk.get_converter('convert_to_extras')]
-                })
+            for field in fields[section]:
+                if fields[section][field]['type'] == 'vocabulary':
+                    schema.update({
+                        field: [tk.get_validator('ignore_missing'),
+                                tk.get_converter('convert_to_tags')(field)]
+                    })
+                else:
+                    schema.update({
+                        field: [tk.get_validator('ignore_missing'),
+                                tk.get_converter('convert_to_extras')]
+                    })
 
         return schema
 
     def create_package_schema(self):
+        create_vocabularies()
         schema = super(DdiSchema, self).create_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
 
     def update_package_schema(self):
+        create_vocabularies()
         schema = super(DdiSchema, self).update_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
@@ -157,11 +165,17 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         fields = get_ddi_config()['fields']
 
         for section in fields:
-            for field in section:
-                schema.update({
-                    field: [tk.get_converter('convert_from_extras'),
-                            tk.get_validator('ignore_missing')]
-                })
+            for field in fields[section]:
+                if fields[section][field]['type'] == 'vocabulary':
+                    schema.update({
+                        field: [tk.get_converter('convert_from_tags')(field),
+                                tk.get_validator('ignore_missing')]
+                    })
+                else:
+                    schema.update({
+                        field: [tk.get_converter('convert_from_extras'),
+                                tk.get_validator('ignore_missing')]
+                    })
 
         return schema
 
@@ -173,7 +187,6 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     plugins.implements(plugins.IConfigurer, inherit=False)
     plugins.implements(plugins.ITemplateHelpers, inherit=False)
-    plugins.implements(plugins.IDatasetForm, inherit=False)
 
     ddi_config = None
 
