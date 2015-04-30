@@ -6,11 +6,27 @@
 
 {% for section in ddi_config['fields'] %}
   {% for field in ddi_config['fields'][section] %}
-    {% if title != 'title' %}
+    {% if field != 'title' %}
       {% if ddi_config['fields'][section][field]['type'] == 'markdown' %}
-        {{ form.markdown(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data.field, error=errors.field, classes=['control-full']) }}
-      {% elif ddi_config['fields'][section][field]['type'] in ['text', 'vocabulary'] %}
-        {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data.field, error=errors.field, classes=['control-full']) }}
+        {{ form.markdown(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
+      {% elif ddi_config['fields'][section][field]['type'] == 'text' %}
+        {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
+      {% elif ddi_config['fields'][section][field]['type'] == 'vocabulary' %}
+        {% set options = ddi_config['vocabularies'][field] %}
+
+        <div class="control-group">
+          {% set error = errors.field %}
+          <label class="control-label" for="field-{{ field }}">{{ _(ddi_config['fields'][section][field]['display']) }}</label>
+          <div class="controls">
+            <select id="field-{{ field }}" name="{{ field }}" data-module="autocomplete">
+              {% for option in options  %}
+                <option value="{{ option }}" {% if data.get(field, 'notspecified') == option %}selected="selected"{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+            {% if error %}<span class="error-block">{{ error }}</span>{% endif %}
+          </div>
+            </div>
+
       {% endif %}
     {% endif %}
   {% endfor %}

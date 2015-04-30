@@ -36,61 +36,15 @@ def get_ddi_config():
     return ddi_config
 
 
-def create_vocabularies():
+def get_vocabulary_values(vocabulary):
     """
-    Create vocabularies from config, if they don't exist already
+    Given the name of a vocabulary, get the accepted values for it
     """
-    user = tk.get_action('get_site_user')({'ignore_auth': True}, {})
-    context = {'user': user['name']}
-    vocabularies = get_ddi_config()['vocabularies']
-
-    for vocab in vocabularies:
-        try:
-            data = {'id': vocab}
-            tk.get_action('vocabulary_show')(context, data)
-            logging.info('Vocabulary ' + vocab + ' already exists')
-        except tk.ObjectNotFound:
-            logging.info('Creating vocabulary ' + vocab)
-            data = {'name': vocab}
-            new_vocab = tk.get_action('vocabulary_create')(context, data)
-            # Add a blank value to the list of values in the vocabulary
-            vocabularies[vocab].append('    ')
-
-            for tag in vocabularies[vocab]:
-                logging.info(
-                    "Adding tag {0} to vocab 'updateInterval'".format(tag))
-                data = {'name': tag, 'vocabulary_id': new_vocab['id']}
-                tk.get_action('tag_create')(context, data)
-
-
-def get_vocabulary(vocabulary):
-    try:
-        return tk.get_action('tag_list')(data_dict={'vocabulary_id': vocabulary})
-    except tk.ObjectNotFound:
-        logging.info('Could not get tags for vocabulary ' + vocabulary)
-
-        return None
-
-
-def get_vocabulary_values(package_dict):
-    results = {}
-    vocabularies = get_ddi_config()['vocabularies']
-
-    for vocab in vocabularies:
-        results[vocab] = ['    ']
-
-    try:
-        extras = package_dict['extras']
-        for extra in extras:
-            for vocab in vocabularies:
-                if extra['key'] == vocab:
-                    results[vocab].append(extra['value'])
-
-        return results
-
-    except KeyError as e:
-        logging.info(e)
-        return results
+    log.debug(vocabulary)
+    log.debug(get_ddi_config()['vocabularies'])
+    values = get_ddi_config()['vocabularies'][vocabulary]
+    log.debug(values)
+    return values
 
 
 def get_package_dict(dataset_id):
@@ -129,12 +83,6 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         for section in fields:
             for field in fields[section]:
-                if fields[section][field]['type'] == 'vocabulary':
-                    schema.update({
-                        field: [tk.get_validator('ignore_missing'),
-                                tk.get_converter('convert_to_tags')(field)]
-                    })
-                else:
                     schema.update({
                         field: [tk.get_validator('ignore_missing'),
                                 tk.get_converter('convert_to_extras')]
@@ -143,13 +91,11 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return schema
 
     def create_package_schema(self):
-        create_vocabularies()
         schema = super(DdiSchema, self).create_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
 
     def update_package_schema(self):
-        create_vocabularies()
         schema = super(DdiSchema, self).update_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
@@ -166,16 +112,10 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
         for section in fields:
             for field in fields[section]:
-                if fields[section][field]['type'] == 'vocabulary':
-                    schema.update({
-                        field: [tk.get_converter('convert_from_tags')(field),
-                                tk.get_validator('ignore_missing')]
-                    })
-                else:
-                    schema.update({
-                        field: [tk.get_converter('convert_from_extras'),
-                                tk.get_validator('ignore_missing')]
-                    })
+                schema.update({
+                    field: [tk.get_converter('convert_from_extras'),
+                            tk.get_validator('ignore_missing')]
+                })
 
         return schema
 
@@ -200,7 +140,6 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         log.debug("get_helpers")
         return {
             'ddi_theme_get_ddi_config': get_ddi_config,
-            'ddi_theme_get_vocabulary': get_vocabulary,
             'ddi_theme_get_vocabulary_values': get_vocabulary_values,
             'ddi_theme_get_package_dict': get_package_dict
         }

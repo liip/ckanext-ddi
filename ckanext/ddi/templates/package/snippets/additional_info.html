@@ -2,10 +2,8 @@
 
 <section class="additional-info module-content" xmlns="http://www.w3.org/1999/html">
   {% for section in ddi_config['fields'] %}
+    <h3>{{ ddi_config['sections'][section] }}</h3>
     <table class="table package-{{section}}">
-        <tr>
-            <h3>{{ ddi_config['sections'][section] }}</h3>
-        </tr>
         {% for field in ddi_config['fields'][section] %}
           {% if ddi_config['fields'][section][field]['visible'] and field in pkg and pkg[field] %}
             <tr>
