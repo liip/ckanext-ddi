@@ -1,27 +1,14 @@
-import os
-from lxml import etree
-from uuid import uuid4
 from pprint import pprint
 
-import urllib3
-import tempfile
-import shutil
+import requests
 
-from ckan import model
-from ckan.model import Session, Package
-from ckan.logic import get_action, action
-from ckan.lib.helpers import json
-from ckanext.harvest.harvesters.base import munge_tag
 from ckan.lib.munge import munge_title_to_name
 
-from ckanext.harvest.model import HarvestObject
 from ckanext.harvest.harvesters import HarvesterBase
 
 from ckanext.ddi.importer import metadata
 
 import ckanapi
-
-from pylons import config
 
 import logging
 log = logging.getLogger(__name__)
@@ -36,12 +23,12 @@ class DdiImporter(HarvesterBase):
                 pkg_dict = ckan_metadata.load(xml_file.read())
         elif url is not None:
             log.debug('Fetch file from %s' % url)
-            http = urllib3.PoolManager()
-            xml_file = http.request('GET', url)
+            r = requests.get(url)
+            xml_file = r.text
 
             # fd, temp_path = tempfile.mkstemp()
             # fd.write(xml_file.data)
-            pkg_dict = ckan_metadata.load(xml_file.data)
+            pkg_dict = ckan_metadata.load(xml_file)
             # os.close(fd)
             # os.remove(temp_path)
         
