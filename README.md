@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/liip/ckanext-ddi.svg?branch=master)](https://travis-ci.org/liip/ckanext-ddi)
+
 ckanext-ddi
 ===========
 
@@ -43,3 +45,15 @@ paster --plugin=ckanext-ddi harvester gather_consumer -c development.ini &
 paster --plugin=ckanext-ddi harvester fetch_consumer -c development.ini &
 paster --plugin=ckanext-ddi harvester run -c development.ini
 ```
+
+## Development
+
+This CKAN extensions uses flake8 to ensure basic code quality.
+
+You can add a pre-commit hook when you have installed flake8:
+
+```bash
+flake8 --install-hook
+```
+
+Travis CI is used to check the code for all PRs.
