@@ -4,3 +4,4 @@ lxml==2.2.4
 pyyaml==3.11
 requests==2.5.3
 ckanapi==3.4
+flake8==2.1.0
