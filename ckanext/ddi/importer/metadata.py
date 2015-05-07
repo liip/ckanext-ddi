@@ -224,25 +224,25 @@ class DdiCkanMetadata(CkanMetadata):
 #         'geoCoverage':  ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/geogCover/text()'),  # noqa
 #         'rights':       ('textList', 'oai_ddi:codeBook/stdyInfo/citation/prodStmt/copyright/text()')   # noqa
     mapping = {
-        'id': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo'),
+        'id': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo'),  # noqa
         'name': FirstInOrderAttribute([
             XPathTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:altTitl"
+                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:altTitl"  # noqa
             ),
             XPathTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"
+                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"  # noqa
             ),
         ]),
         'title': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"  # noqa
         ),
         'url': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/ddi:@URI"
+            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/ddi:@URI"  # noqa
         ),
         'author': CombinedAttribute(
             [
-                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),
-                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),
+                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
+                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
             ],
             separator=', '
         ),
@@ -250,15 +250,15 @@ class DdiCkanMetadata(CkanMetadata):
         'maintainer': StringAttribute(''),
         'maintainer_email': StringAttribute(''),
         'license_url': XPathTextAttribute(
-            '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'
+            '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
-        'version': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:prodDate'),
+        'version': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:prodDate'),  # noqa
         'notes': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
         'tags': ArrayAttribute([
             XPathMultiTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword"
+                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword"  # noqa
             )
         ]),
     }

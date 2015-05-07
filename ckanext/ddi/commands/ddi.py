@@ -56,6 +56,6 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
                 importer.run(url=path_or_url)
             else:
                 importer.run(file_path=path_or_url)
-        except Exception, e:
+        except Exception:
             import traceback
             traceback.print_exc()
