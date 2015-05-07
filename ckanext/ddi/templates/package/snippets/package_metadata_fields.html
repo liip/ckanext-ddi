@@ -1,82 +1,35 @@
 {% import 'macros/form.html' as form %}
-{% set p = h.get_package_dict(data.id) %}
+{% set pkg = h.ddi_theme_get_package_dict(data.id) %}
+{% set ddi_config = h.ddi_theme_get_ddi_config() %}
 
 {% block package_metadata_fields %}
 
-{# Overview #}
+{% for section in ddi_config['fields'] %}
+  {% for field in ddi_config['fields'][section] %}
+    {% if field != 'title' %}
+      {% if ddi_config['fields'][section][field]['type'] == 'markdown' %}
+        {{ form.markdown(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
+      {% elif ddi_config['fields'][section][field]['type'] == 'text' %}
+        {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
+      {% elif ddi_config['fields'][section][field]['type'] == 'vocabulary' %}
+        {% set options = ['    '] + ddi_config['vocabularies'][field] %}
 
-{% block package_overview_fields_abstract %}
-  {{ form.markdown('abstract', id='field-abstract', label=_('Abstract'), placeholder=_('Abstract'), value=data.abstract, error=errors.studyType, classes=['control-full']) }}
-{% endblock %}
+        <div class="control-group">
+          {% set error = errors.field %}
+          <label class="control-label" for="field-{{ field }}">{{ _(ddi_config['fields'][section][field]['display']) }}</label>
+          <div class="controls">
+            <select id="field-{{ field }}" name="{{ field }}" data-module="autocomplete">
+              {% for option in options  %}
+                <option value="{{ option }}" {% if data.get(field, 'notspecified') == option %}selected="selected"{% endif %}>{{ option }}</option>
+              {% endfor %}
+            </select>
+            {% if error %}<span class="error-block">{{ error }}</span>{% endif %}
+          </div>
+            </div>
 
-{% block package_overview_fields_kindOfData %}
-  {{ form.input('kindOfData', id='field-kindOfData', label=_('Kind of data'), placeholder=_('Kind of data'), value=data.kindOfData, error=errors.kindOfData, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_overview_fields_unitOfAnalysis %}
-  {{ form.input('unitOfAnalysis', id='field-unitOfAnalysis', label=_('Unit of analysis'), placeholder=_('Unit of analysis'), value=data.unitOfAnalysis, error=errors.unitOfAnalysis, classes=['control-full']) }}
-{% endblock %}
-
-{# Scope #}
-
-{% block package_scope_fields_descriptionOfScope %}
-  {{ form.markdown('descriptionOfScope', id='field-descriptionOfScope', label=_('Description of scope'), placeholder=_('descriptionOfScope'), value=data.descriptionOfScope, error=errors.descriptionOfScope, classes=['control-full']) }}
-{% endblock %}
-
-{# Coverage #}
-
-{% block package_scope_fields_country %}
-  {{ form.input('country', id='field-country', label=_('Country'), placeholder=_('Country'), value=data.country, error=errors.country, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_scope_fields_geographicCoverage %}
-  {{ form.input('geographicCoverage', id='field-geographicCoverage', label=_('Geographic coverage'), placeholder=_('geographicCoverage'), value=data.geographicCoverage, error=errors.geographicCoverage, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_scope_fields_universe %}
-  {{ form.input('universe', id='field-universe', label=_('Universe'), placeholder=_('Universe'), value=data.universe, error=errors.universe, classes=['control-full']) }}
-{% endblock %}
-
-{# Producers and Sponsors #}
-
-{% block package_producers_fields_primaryInvestigator %}
-  {{ form.input('primaryInvestigator', id='field-primaryInvestigator', label=_('Primary investigator'), placeholder=_('primaryInvestigator'), value=data.primaryInvestigator, error=errors.primaryInvestigator, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_producers_fields_otherProducers %}
-  {{ form.input('otherProducers', id='field-otherProducers', label=_('Other producers'), placeholder=_('Other producers'), value=data.otherProducers, error=errors.otherProducers, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_producers_fields_funding %}
-  {{ form.input('funding', id='field-funding', label=_('Funding'), placeholder=_('Funding'), value=data.funding, error=errors.funding, classes=['control-full']) }}
-{% endblock %}
-
-{# Sampling #}
-
-{% block package_sampling_fields_samplingProcedure %}
-  {{ form.markdown('samplingProcedure', id='field-samplingProcedure', label=_('Sampling procedure'), placeholder=_('Sampling procedure'), value=data.samplingProcedure, error=errors.samplingProcedure, classes=['control-full']) }}
-{% endblock %}
-
-{# Data Collection #}
-
-{% block package_data_collection_fields_datesOfDataCollection %}
-  {{ form.input('datesOfDataCollection', id='field-datesOfDataCollection', label=_('Dates of data collection'), placeholder=_('Dates of data collection'), value=data.datesOfDataCollection, error=errors.datesOfDataCollection, classes=['control-full']) }}
-{% endblock %}
-
-{# Data Appraisal #}
-
-{% block package_data_appraisal_fields_accessAuthority %}
-{{ form.input('accessAuthority', id='field-accessAuthority', label=_('Access authority'), placeholder=_('Access authority'), value=data.accessAuthority, error=errors.accessAuthority, classes=['control-full']) }}
-{% endblock %}
-
-{% block package_data_appraisal_fields_citationRequirement %}
-{{ form.input('citationRequirement', id='field-citationRequirement', label=_('Citation requirement'), placeholder=_('Citation requirement'), value=data.citationRequirement, error=errors.citationRequirement, classes=['control-full']) }}
-{% endblock %}
-
-{# Contacts #}
-
-{% block package_contacts_fields_contactPersons %}
-  {{ form.input('contactPersons', id='field-contactPersons', label=_('Contact persons'), placeholder=_('Contact persons'), value=data.contactPersons, error=errors.contactPersons, classes=['control-full']) }}
-{% endblock %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
 
 {% endblock %}

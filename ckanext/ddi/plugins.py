@@ -3,11 +3,11 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 import yaml
+from collections import OrderedDict
 
 import logging
 from pylons import config
 log = logging.getLogger(__name__)
-
 
 
 class DdiHarvest(plugins.SingletonPlugin):
@@ -15,6 +15,42 @@ class DdiHarvest(plugins.SingletonPlugin):
     Plugin containing the harvester for ddi for
     the World Bank
     """
+
+
+def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
+    class OrderedLoader(Loader):
+        pass
+
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    return yaml.load(stream, OrderedLoader)
+
+
+def get_ddi_config():
+    with open(config.get('ckanext.ddi.config_file')) as config_file:
+        ddi_config = ordered_load(config_file)
+    return ddi_config
+
+
+def get_vocabulary_values(vocabulary):
+    """
+    Given the name of a vocabulary, get the accepted values for it
+    """
+    log.debug(vocabulary)
+    log.debug(get_ddi_config()['vocabularies'])
+    values = get_ddi_config()['vocabularies'][vocabulary]
+    log.debug(values)
+    return values
+
+
+def get_package_dict(dataset_id):
+    user = tk.get_action('get_site_user')({}, {})
+    context = {'user': user['name']}
+    return tk.get_action('package_show')(context, {'id': dataset_id})
 
 
 class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
@@ -42,121 +78,15 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return []
 
     def _modify_package_schema(self, schema):
-        # Add new fields as extras
-        # Identification fields
-        schema.update({
-            'abbreviation': [tk.get_validator('ignore_missing'),
-                             tk.get_converter('convert_to_extras')]
-        })
+        # Add new fields from the config as extras
+        fields = get_ddi_config()['fields']
 
-        schema.update({
-            'studyType': [tk.get_validator('ignore_missing'),
-                          tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'seriesInformation': [tk.get_validator('ignore_missing'),
-                                  tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'idNumber': [tk.get_validator('ignore_missing'),
-                         tk.get_converter('convert_to_extras')]
-        })
-
-        # Version fields
-        schema.update({
-            'productionDate': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'description': [tk.get_validator('ignore_missing'),
-                      tk.get_converter('convert_to_extras')]
-        })
-
-        # Overview fields
-        schema.update({
-            'abstract': [tk.get_validator('ignore_missing'),
-                         tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'kindOfData': [tk.get_validator('ignore_missing'),
-                           tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'unitOfAnalysis': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
-
-        # Scope fields
-        schema.update({
-            'descriptionOfScope': [tk.get_validator('ignore_missing'),
-                                   tk.get_converter('convert_to_extras')]
-        })
-
-        # Coverage fields
-        schema.update({
-            'country': [tk.get_validator('ignore_missing'),
-                        tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'geographicCoverage': [tk.get_validator('ignore_missing'),
-                                   tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'universe': [tk.get_validator('ignore_missing'),
-                         tk.get_converter('convert_to_extras')]
-        })
-
-        # Producers and Sponsors fields
-        schema.update({
-            'primaryInvestigator': [tk.get_validator('ignore_missing'),
-                                    tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'otherProducers': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'funding': [tk.get_validator('ignore_missing'),
-                        tk.get_converter('convert_to_extras')]
-        })
-
-        # Sampling fields
-        schema.update({
-            'samplingProcedure': [tk.get_validator('ignore_missing'),
-                                  tk.get_converter('convert_to_extras')]
-        })
-
-        # Data Collection fields
-        schema.update({
-            'datesOfDataCollection': [tk.get_validator('ignore_missing'),
-                                      tk.get_converter('convert_to_extras')]
-        })
-
-        # Data Appraisal fields
-        schema.update({
-            'accessAuthority': [tk.get_validator('ignore_missing'),
+        for section in fields:
+            for field in fields[section]:
+                    schema.update({
+                        field: [tk.get_validator('ignore_missing'),
                                 tk.get_converter('convert_to_extras')]
-        })
-
-        schema.update({
-            'citationRequirement': [tk.get_validator('ignore_missing'),
-                                    tk.get_converter('convert_to_extras')]
-        })
-
-        # Contacts fields
-        schema.update({
-            'contactPersons': [tk.get_validator('ignore_missing'),
-                               tk.get_converter('convert_to_extras')]
-        })
+                    })
 
         return schema
 
@@ -177,132 +107,22 @@ class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         # (e.g. on dataset pages, or on the search page)
         schema['tags']['__extras'].append(tk.get_converter('free_tags_only'))
 
-        # Add new fields to the dataset schema.
-        # Identification fields
-        schema.update({
-            'studyType': [tk.get_converter('convert_from_extras'),
-                          tk.get_validator('ignore_missing')]
-        })
+        # Add new fields from the config to the dataset schema.
+        fields = get_ddi_config()['fields']
 
-        schema.update({
-            'seriesInformation': [tk.get_converter('convert_from_extras'),
-                                  tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'idNumber': [tk.get_converter('convert_from_extras'),
-                         tk.get_validator('ignore_missing')]
-        })
-
-        # Version fields
-
-        schema.update({
-            'productionDate': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'description': [tk.get_converter('convert_from_extras'),
-                      tk.get_validator('ignore_missing')]
-        })
-
-        # Overview fields
-        schema.update({
-            'abstract': [tk.get_converter('convert_from_extras'),
-                         tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'kindOfData': [tk.get_converter('convert_from_extras'),
-                           tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'unitOfAnalysis': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
-
-        # Scope fields
-
-        schema.update({
-            'descriptionOfScope': [tk.get_converter('convert_from_extras'),
-                                   tk.get_validator('ignore_missing')]
-        })
-
-        # Coverage fields
-        schema.update({
-            'country': [tk.get_converter('convert_from_extras'),
-                        tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'geographicCoverage': [tk.get_converter('convert_from_extras'),
-                                   tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'universe': [tk.get_converter('convert_from_extras'),
-                         tk.get_validator('ignore_missing')]
-        })
-
-        # Producers and Sponsors fields
-        schema.update({
-            'primaryInvestigator': [tk.get_converter('convert_from_extras'),
-                                    tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'otherProducers': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'funding': [tk.get_converter('convert_from_extras'),
-                        tk.get_validator('ignore_missing')]
-        })
-
-        # Sampling fields
-        schema.update({
-            'samplingProcedure': [tk.get_converter('convert_from_extras'),
-                                  tk.get_validator('ignore_missing')]
-        })
-
-        # Data Collection fields
-        schema.update({
-            'datesOfDataCollection': [tk.get_converter('convert_from_extras'),
-                                      tk.get_validator('ignore_missing')]
-        })
-        # Data Appraisal fields
-        schema.update({
-            'accessAuthority': [tk.get_converter('convert_from_extras'),
-                                tk.get_validator('ignore_missing')]
-        })
-
-        schema.update({
-            'citationRequirement': [tk.get_converter('convert_from_extras'),
-                                    tk.get_validator('ignore_missing')]
-        })
-
-        # Contacts fields
-        schema.update({
-            'contactPersons': [tk.get_converter('convert_from_extras'),
-                               tk.get_validator('ignore_missing')]
-        })
+        for section in fields:
+            for field in fields[section]:
+                schema.update({
+                    field: [tk.get_converter('convert_from_extras'),
+                            tk.get_validator('ignore_missing')]
+                })
 
         return schema
 
 
-
-def get_ddi_config():
-    with open(config.get('ckanext.ddi.config_file')) as config_file: 
-        ddi_config = yaml.load(config_file)
-    return ddi_config
-
-
 class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
     """
-    Plugin containing the theme for ddi for
-    the World Bank
+    Plugin containing the theme for ddi for the World Bank
     """
 
     plugins.implements(plugins.IConfigurer, inherit=False)
@@ -318,7 +138,11 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
 
     def get_helpers(self):
         log.debug("get_helpers")
-        return {'ddi_theme_get_ddi_config': get_ddi_config }
+        return {
+            'ddi_theme_get_ddi_config': get_ddi_config,
+            'ddi_theme_get_vocabulary_values': get_vocabulary_values,
+            'ddi_theme_get_package_dict': get_package_dict
+        }
 
     def is_fallback(self):
         # Return True to register this plugin as the default handler for
