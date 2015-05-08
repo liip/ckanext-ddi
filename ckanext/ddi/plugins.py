@@ -155,7 +155,7 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return []
 
     def setup_template_variables(self, context, data_dict):
-        context['ddi_config'] = self.ddi_config 
+        context['ddi_config'] = self.ddi_config
         return super(DdiTheme, self).setup_template_variables(
             context, data_dict
         )

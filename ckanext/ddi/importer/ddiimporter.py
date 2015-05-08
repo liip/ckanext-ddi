@@ -31,7 +31,7 @@ class DdiImporter(HarvesterBase):
             pkg_dict = ckan_metadata.load(xml_file)
             # os.close(fd)
             # os.remove(temp_path)
-        
+
         try:
             registry = ckanapi.LocalCKAN()
             pprint(pkg_dict)

@@ -1,20 +1,20 @@
-#coding: utf-8
+# -*- coding: utf-8 -*-
 
-import os
-from lxml import etree
-from uuid import uuid4
+# from lxml import etree
+# from uuid import uuid4
 
 from ckan import model
-from ckan.model import Session, Package
-from ckan.logic import get_action, action
+from ckan.model import Session
+# from ckan.model import Session, Package
+# from ckan.logic import get_action, action
+# from ckanext.harvest.harvesters.base import munge_tag
+# from ckan.lib.munge import munge_title_to_name
 from ckan.lib.helpers import json
-from ckanext.harvest.harvesters.base import munge_tag
-from ckan.lib.munge import munge_title_to_name
 
-from ckanext.harvest.model import HarvestObject
+# from ckanext.harvest.model import HarvestObject
 from ckanext.harvest.harvesters import HarvesterBase
 
-from pylons import config
+# from pylons import config
 
 import logging
 log = logging.getLogger(__name__)
@@ -73,11 +73,11 @@ class DdiHarvester(HarvesterBase):
             package_dict['id'] = harvest_object.guid
 
             user = model.User.get(self.HARVEST_USER)
-            context = {
-                'model': model,
-                'session': Session,
-                'user': self.HARVEST_USER
-                }
+            # context = {
+            #     'model': model,
+            #     'session': Session,
+            #     'user': self.HARVEST_USER
+            #     }
 
             package = model.Package.get(package_dict['id'])
             model.PackageRole(
