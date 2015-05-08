@@ -29,6 +29,7 @@ setup(
     ddi_harvester=ckanext.ddi.harvesters:DdiHarvester
     ddi_theme=ckanext.ddi.plugins:DdiTheme
     ddi_schema=ckanext.ddi.plugins:DdiSchema
+    ddi_import=ckanext.ddi.plugins:DdiImport
     [paste.paster_command]
     harvester=ckanext.ddi.commands.harvester:Harvester
     ddi=ckanext.ddi.commands.ddi:DdiCommand
