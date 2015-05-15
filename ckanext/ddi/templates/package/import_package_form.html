@@ -1,8 +1,26 @@
 {% import 'macros/form.html' as form %}
 {% set form_style = c.form_style or c.action %}
 
-<form class="dataset-form form-horizontal" method="post" action="{{ action }}" data-module="basic-form">
+  {{ data }}
+
+<form class="dataset-form form-horizontal" method="post" action="import2" data-module="basic-form">
   {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
+
+  {% block package_basic_fields_url %}
+    {% set prefix = h.url_for(controller='package', action='read', id='') %}
+    {% set domain = h.url_for(controller='package', action='read', id='', qualified=true) %}
+    {% set domain = domain|replace("http://", "")|replace("https://", "") %}
+    {% set attrs = {'data-module': 'slug-preview-slug', 'data-module-prefix': domain, 'data-module-placeholder': '<dataset>'} %}
+
+    {{ form.prepend('name', id='field-name', label=_('URL'), prepend=prefix, placeholder=_('eg. my-dataset'), value=data.name, error=errors.name, attrs=attrs, is_required=true) }}
+  {% endblock %}
+
+  {% block basic_fields_url %}
+    {% set is_upload = (data.url_type == 'upload') %}
+    {{ form.image_upload(data, errors, field_url='url', field_upload='upload', field_clear='clear_upload',
+       is_upload_enabled=h.uploads_enabled(), is_url=data.url and not is_upload, is_upload=is_upload,
+       upload_label=_('File'), url_label=_('URL')) }}
+  {% endblock %}
 
   {% block form_actions %}
     <div class="form-actions">
@@ -15,13 +33,7 @@
           {%- endtrans -%}
         </p>
       {% endblock %}
-      {% block delete_button %}
-        {% if h.check_access('package_delete', {'id': data.id}) and not data.state == 'deleted' %}
-          {% set locale = h.dump_json({'content': _('Are you sure you want to delete this dataset?')}) %}
-          <a class="btn btn-danger pull-left" href="{% url_for controller='package', action='delete', id=data.id %}" data-module="confirm-action" data-module-i18n="{{ locale }}">{% block delete_button_text %}{{ _('Delete') }}{% endblock %}</a>
-        {% endif %}
-      {% endblock %}
-      <button class="btn btn-primary" type="submit" name="save">{% block save_button_text %}{{ _('Import') }}{% endblock %}</button>
+      <button class="btn btn-primary" type="submit" name="import">{% block import_button_text %}{{ _('Import') }}{% endblock %}</button>
       {{ form.required_message() }}
     </div>
   {% endblock %}

@@ -64,8 +64,8 @@ class DdiImport(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
 
     def before_map(self, map):
-        map.connect('/dataset/import', controller='ckanext.ddi.controllers:PackageNew', action='new')
-        # map.connect('/dataset/edit/{id}', controller='ckanext.ddi.controllers:PackageNew', action='edit')
+        map.connect('/dataset/import', controller='ckanext.ddi.controllers:ImportFromXml', action='new')
+        map.connect('/dataset/import2', controller='ckanext.ddi.controllers:ImportFromXml', action='run_import')
         return map
 
     def after_map(self, map):

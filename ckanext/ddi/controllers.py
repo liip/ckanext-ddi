@@ -13,6 +13,8 @@ import ckan.lib.render
 from ckan.common import OrderedDict, _, json, request, c, g, response
 from ckan.controllers.home import CACHE_PARAMETERS
 
+from ckanext.ddi.importer import ddiimporter
+
 log = logging.getLogger(__name__)
 
 render = base.render
@@ -32,7 +34,7 @@ flatten_to_string_key = logic.flatten_to_string_key
 lookup_package_plugin = ckan.lib.plugins.lookup_package_plugin
 
 
-class PackageNew(PackageController):
+class ImportFromXml(PackageController):
     package_form = 'package/import_package_form.html'
 
     def new(self, data=None, errors=None, error_summary=None):
@@ -62,13 +64,6 @@ class PackageNew(PackageController):
 
         errors = errors or {}
         error_summary = error_summary or {}
-        # in the phased add dataset we need to know that
-        # we have already completed stage 1
-        stage = ['active']
-        if data.get('state') == 'draft':
-            stage = ['active', 'complete']
-        elif data.get('state') == 'draft-complete':
-            stage = ['active', 'complete', 'complete']
 
         # if we are creating from a group then this allows the group to be
         # set automatically
@@ -77,7 +72,7 @@ class PackageNew(PackageController):
 
         vars = {'data': data, 'errors': errors,
                 'error_summary': error_summary,
-                'action': 'new', 'stage': stage}
+                'action': 'new'}
         c.errors_json = h.json.dumps(errors)
 
         self._setup_template_variables(context, {},
@@ -90,5 +85,62 @@ class PackageNew(PackageController):
         else:
             c.form = render(self._package_form(package_type=package_type),
                             extra_vars=vars)
-        return render(self._new_template(package_type),
-                      extra_vars={'stage': stage})
+        return render(self._new_template(package_type))
+
+
+    def run_import(self, data=None, errors=None, error_summary=None):
+        importer = ddiimporter.DdiImporter
+
+        # Check whether upload is a file or a url
+        # If it's a url, we pass in the url to the importer.run and call it
+        # If it's a file, check whether it's a valid XML and if not, return a message
+        # If it is a proper XML, pass it into the importer.run and call it
+
+        package_type = self._guess_package_type(True)
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author, 'auth_user_obj': c.userobj,
+                   'save': 'save' in request.params}
+
+        # Package needs to have a organization group in the call to
+        # check_access and also to save it
+        try:
+            check_access('package_create', context)
+        except NotAuthorized:
+            abort(401, _('Unauthorized to create a package'))
+
+        if context['save'] and not data:
+            return self._save_new(context, package_type=package_type)
+
+        data = data or clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(
+            request.params, ignore_keys=CACHE_PARAMETERS))))
+        c.resources_json = h.json.dumps(data.get('resources', []))
+        # convert tags if not supplied in data
+        if data and not data.get('tag_string'):
+            data['tag_string'] = ', '.join(
+                h.dict_list_reduce(data.get('tags', {}), 'name'))
+
+        errors = errors or {}
+        error_summary = error_summary or {}
+
+        # if we are creating from a group then this allows the group to be
+        # set automatically
+        data['group_id'] = request.params.get('group') or \
+            request.params.get('groups__0__id')
+
+        vars = {'data': data, 'errors': errors,
+                'error_summary': error_summary,
+                'action': 'new'}
+        c.errors_json = h.json.dumps(errors)
+
+        self._setup_template_variables(context, {},
+                                       package_type=package_type)
+
+        # TODO: This check is to maintain backwards compatibility with the
+        # old way of creating custom forms. This behaviour is now deprecated.
+        if hasattr(self, 'package_form'):
+            c.form = render(self.package_form, extra_vars=vars)
+        else:
+            c.form = render(self._package_form(package_type=package_type),
+                            extra_vars=vars)
+        return render(self._new_template(package_type))
