@@ -6,15 +6,6 @@
 <form class="dataset-form form-horizontal" method="post" action="import2" data-module="basic-form">
   {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
 
-  {% block package_basic_fields_url %}
-    {% set prefix = h.url_for(controller='package', action='read', id='') %}
-    {% set domain = h.url_for(controller='package', action='read', id='', qualified=true) %}
-    {% set domain = domain|replace("http://", "")|replace("https://", "") %}
-    {% set attrs = {'data-module': 'slug-preview-slug', 'data-module-prefix': domain, 'data-module-placeholder': '<dataset>'} %}
-
-    {{ form.prepend('name', id='field-name', label=_('URL'), prepend=prefix, placeholder=_('eg. my-dataset'), value=data.name, error=errors.name, attrs=attrs, is_required=true) }}
-  {% endblock %}
-
   {% block basic_fields_url %}
     {% set is_upload = (data.url_type == 'upload') %}
     {{ form.image_upload(data, errors, field_url='url', field_upload='upload', field_clear='clear_upload',
