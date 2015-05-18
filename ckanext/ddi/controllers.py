@@ -87,20 +87,22 @@ class ImportFromXml(PackageController):
                             extra_vars=vars)
         return render(self._new_template(package_type))
 
-
     def run_import(self, data=None, errors=None, error_summary=None):
-        importer = ddiimporter.DdiImporter
+        importer = ddiimporter.DdiImporter()
 
         # Check whether upload is a file or a url
         # If it's a url, we pass in the url to the importer.run and call it
         # If it's a file, check whether it's a valid XML and if not, return a message
         # If it is a proper XML, pass it into the importer.run and call it
 
+        if 'url' in request.params:
+            log.debug(request.params['url'])
+            importer.run(url=request.params['url'])
+
         package_type = self._guess_package_type(True)
 
         context = {'model': model, 'session': model.Session,
-                   'user': c.user or c.author, 'auth_user_obj': c.userobj,
-                   'save': 'save' in request.params}
+                   'user': c.user or c.author, 'auth_user_obj': c.userobj}
 
         # Package needs to have a organization group in the call to
         # check_access and also to save it
@@ -109,16 +111,10 @@ class ImportFromXml(PackageController):
         except NotAuthorized:
             abort(401, _('Unauthorized to create a package'))
 
-        if context['save'] and not data:
-            return self._save_new(context, package_type=package_type)
-
         data = data or clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(
             request.params, ignore_keys=CACHE_PARAMETERS))))
-        c.resources_json = h.json.dumps(data.get('resources', []))
-        # convert tags if not supplied in data
-        if data and not data.get('tag_string'):
-            data['tag_string'] = ', '.join(
-                h.dict_list_reduce(data.get('tags', {}), 'name'))
+
+        # return request.params['url']
 
         errors = errors or {}
         error_summary = error_summary or {}
