@@ -19,10 +19,13 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
         paster --plugin=ckanext-ddi <command> -c <path to config file>
 
         # Show this help
-        paster ddi help
+        paster --plugin=ckanext-ddi ddi help
+
+        # Show current configuration
+        paster --plugin=ckanext-ddi ddi config
 
         # Import datasets
-        paster ddi import <path_or_url>
+        paster --plugin=ckanext-ddi ddi import <path_or_url>
 
     '''
     summary = __doc__.split('\n')[0]
