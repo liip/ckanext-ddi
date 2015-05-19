@@ -332,7 +332,7 @@ class DdiCkanMetadata(CkanMetadata):
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
         'url': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/ddi:@URI"  # noqa
+            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/@URI"  # noqa
         ),
         'author': CombinedAttribute(
             [
@@ -346,7 +346,7 @@ class DdiCkanMetadata(CkanMetadata):
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
         'maintainer_email': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/ddi:@email"  # noqa
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
         ),
         'license_url': XPathTextAttribute(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
