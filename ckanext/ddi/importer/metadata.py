@@ -81,15 +81,13 @@ class XPathTextAttribute(XPathAttribute):
 
 class XPathMultiTextAttribute(XPathMultiAttribute):
     def get_value(self, **kwargs):
+        self.env.update(kwargs)
         values = super(XPathMultiTextAttribute, self).get_value(**kwargs)
-        separator = self.env['separator'] if 'separator' in self.env else ' '
-        return_value = ''
+        return_values = []
         for value in values:
-            if hasattr(value, 'text'):
-                return_value = return_value + value.text + separator
-            else:
-                return_value = return_value + value + separator
-        return return_value
+            if hasattr(value, 'text') and value.text is not None and value.text.strip() != '':
+                return_values.append(value.text.strip())
+        return return_values
 
 
 class CombinedAttribute(Attribute):
@@ -144,6 +142,14 @@ class ArrayAttribute(Attribute):
             except TypeError:
                 value.append(new_value)
         return value
+
+
+class ArrayTextAttribute(Attribute):
+    def get_value(self, **kwargs):
+        self.env.update(kwargs)
+        values = self._config.get_value(**kwargs)
+        separator = self.env['separator'] if 'separator' in self.env else ' '
+        return separator.join(values)
 
 
 class ArrayDictNameAttribute(ArrayAttribute):
@@ -279,8 +285,10 @@ class DdiCkanMetadata(CkanMetadata):
         'geographic_coverage': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:geogCover"  # noqa
         ),
-        'time_period_covered': XPathMultiTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:timePrd",  # noqa
+        'time_period_covered': ArrayTextAttribute(
+            XPathMultiTextAttribute(
+                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:timePrd"  # noqa
+            ),
             separator=', '
         ),
         'universe': XPathTextAttribute(
@@ -289,19 +297,33 @@ class DdiCkanMetadata(CkanMetadata):
         'primary_investigator': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty"  # noqa
         ),
-        'other_producers': XPathMultiTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId",  # noqa
-            separator=', '
-        ),
-        'funding': XPathMultiTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg",  # noqa
+        'other_producers': FirstInOrderAttribute([
+            ArrayTextAttribute(
+                XPathMultiTextAttribute(
+                    "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId"  # noqa
+                ),
+                separator=', '
+            ),
+            ArrayTextAttribute(
+                XPathMultiTextAttribute(
+                    "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId/ddi:p"  # noqa
+                ),
+                separator=', '
+            ),
+        ]),
+        'funding': ArrayTextAttribute(
+            XPathMultiTextAttribute(
+                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg"
+            ),
             separator=', '
         ),
         'sampling_procedure': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:sampProc"  # noqa
         ),
-        'data_collection_dates': XPathMultiTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:collDate",  # noqa
+        'data_collection_dates': ArrayTextAttribute(
+            XPathMultiTextAttribute(
+                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:collDate",  # noqa
+            ),
             separator=', '
         ),
         'access_authority': XPathTextAttribute(
