@@ -183,6 +183,7 @@ class CkanMetadata(object):
             'maintainer',
             'maintainer_email',
             'license_url',
+            'copyright',
             'version',
             'notes',
             'tags',
@@ -206,6 +207,7 @@ class CkanMetadata(object):
             'sampling_procedure',
             'data_collection_dates',
             'access_authority',
+            'conditions',
             'citation_requirement',
             'contact_persons'
         ])
@@ -325,8 +327,11 @@ class DdiCkanMetadata(CkanMetadata):
         'access_authority': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:contact"  # noqa
         ),
-        'citation_requirement': XPathTextAttribute(
+        'conditions': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions"  # noqa
+        ),
+        'citation_requirement': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:citReq"  # noqa
         ),
         'contact_persons': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
@@ -341,12 +346,15 @@ class DdiCkanMetadata(CkanMetadata):
             ],
             separator=', '
         ),
-        'author_email': StringAttribute(''),
+        'author_email': StringAttribute(''),  # TODO: Do we need that? What DDI field should be used?
         'maintainer': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
         'maintainer_email': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
+        ),
+        'copyright': XPathTextAttribute(
+            '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
         'license_url': XPathTextAttribute(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
