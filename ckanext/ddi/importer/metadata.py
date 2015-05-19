@@ -188,7 +188,6 @@ class CkanMetadata(object):
             'tags',
             'abbreviation',
             'study_type',
-            'series_name',
             'series_info',
             'id_number',
             'description',
@@ -250,9 +249,6 @@ class DdiCkanMetadata(CkanMetadata):
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:altTitl"  # noqa
         ),
         'study_type': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
-        ),
-        'series_name': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt/ddi:serName"  # noqa
         ),
         'series_info': XPathTextAttribute(
