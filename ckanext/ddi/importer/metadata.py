@@ -85,7 +85,11 @@ class XPathMultiTextAttribute(XPathMultiAttribute):
         values = super(XPathMultiTextAttribute, self).get_value(**kwargs)
         return_values = []
         for value in values:
-            if hasattr(value, 'text') and value.text is not None and value.text.strip() != '':
+            if (
+                hasattr(value, 'text')
+                and value.text is not None
+                and value.text.strip() != ''
+            ):
                 return_values.append(value.text.strip())
         return return_values
 
@@ -311,7 +315,7 @@ class DdiCkanMetadata(CkanMetadata):
         ]),
         'funding': ArrayTextAttribute(
             XPathMultiTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg"
+                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg"  # noqa
             ),
             separator=', '
         ),
@@ -346,7 +350,8 @@ class DdiCkanMetadata(CkanMetadata):
             ],
             separator=', '
         ),
-        'author_email': StringAttribute(''),  # TODO: Do we need that? What DDI field should be used?
+        # TODO: Do we need that? What DDI field should be used?
+        'author_email': StringAttribute(''),
         'maintainer': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
