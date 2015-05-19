@@ -1,5 +1,6 @@
 from lxml import etree
 import logging
+from ckan.lib.munge import munge_title_to_name
 log = logging.getLogger(__name__)
 
 namespaces = {
@@ -23,26 +24,6 @@ namespaces = {
     'xs2': 'http://www.w3.org/XML/Schema',
     'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 }
-
-# oai_ddi_reader = MetadataReader(
-#     fields={
-#         'title':        ('textList', 'oai_ddi:codeBook/stdyDscr/citation/titlStmt/titl/text()'),  # noqa
-#         'creator':      ('textList', 'oai_ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty/text()'),  # noqa
-#         'subject':      ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/subject/keyword/text()'),  # noqa
-#         'description':  ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/abstract/text()'),  # noqa
-#         'publisher':    ('textList', 'oai_ddi:codeBook/stdyDscr/citation/distStmt/contact/text()'),  # noqa
-#         'contributor':  ('textList', 'oai_ddi:codeBook/stdyDscr/citation/contributor/text()'),  # noqa
-#         'date':         ('textList', 'oai_ddi:codeBook/stdyDscr/citation/prodStmt/prodDate/text()'),  # noqa
-#         'type':         ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind/text()'),  # noqa
-#         'format':       ('textList', 'oai_ddi:codeBook/fileDscr/fileType/text()'),  # noqa
-#         'identifier':   ('textList', "oai_ddi:codeBook/stdyDscr/citation/titlStmt/IDNo/text()"),  # noqa
-#         'source':       ('textList', 'oai_ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac/@URI'),  # noqa
-#         'language':     ('textList', 'oai_ddi:codeBook/@xml:lang'),  # noqa
-#         'tempCoverage': ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/timePrd/text()'),  # noqa
-#         'geoCoverage':  ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/geogCover/text()'),  # noqa
-#         'rights':       ('textList', 'oai_ddi:codeBook/stdyInfo/citation/prodStmt/copyright/text()')   # noqa
-#     },
-# )
 
 
 class Attribute(object):
@@ -100,8 +81,15 @@ class XPathTextAttribute(XPathAttribute):
 
 class XPathMultiTextAttribute(XPathMultiAttribute):
     def get_value(self, **kwargs):
-        value = super(XPathMultiTextAttribute, self).get_value(**kwargs)
-        return value.text if hasattr(value, 'text') else value
+        values = super(XPathMultiTextAttribute, self).get_value(**kwargs)
+        separator = self.env['separator'] if 'separator' in self.env else ' '
+        return_value = ''
+        for value in values:
+            if hasattr(value, 'text'):
+                return_value = return_value + value.text + separator
+            else:
+                return_value = return_value + value + separator
+        return return_value
 
 
 class CombinedAttribute(Attribute):
@@ -158,6 +146,15 @@ class ArrayAttribute(Attribute):
         return value
 
 
+class ArrayDictNameAttribute(ArrayAttribute):
+    def get_value(self, **kwargs):
+        value = super(ArrayDictNameAttribute, self).get_value(**kwargs)
+        return self.wrap_in_name_dict(value)
+
+    def wrap_in_name_dict(self, values):
+        return [{'name': munge_title_to_name(value)} for value in values]
+
+
 class FirstInOrderAttribute(CombinedAttribute):
     def get_value(self, **kwargs):
         for attribute in self._config:
@@ -183,6 +180,29 @@ class CkanMetadata(object):
             'version',
             'notes',
             'tags',
+            'abbreviation',
+            'study_type',
+            'series_name',
+            'series_info',
+            'id_number',
+            'description',
+            'production_type',
+            'abstract',
+            'kind_of_data',
+            'unit_of_analysis',
+            'description_of_scope',
+            'country',
+            'geographic_coverage',
+            'time_period_covered',
+            'universe',
+            'primary_investigator',
+            'other_producers',
+            'funding',
+            'sampling_procedure',
+            'data_collection_dates',
+            'access_authority',
+            'citation_requirement',
+            'contact_persons'
         ])
 
     def get_attribute(self, ckan_attribute):
@@ -207,22 +227,6 @@ class CkanMetadata(object):
 
 class DdiCkanMetadata(CkanMetadata):
     """ Provides access to the DDI metadata """
-
-#         'title':        ('textList', 'oai_ddi:codeBook/stdyDscr/citation/titlStmt/titl/text()'),  # noqa
-#         'creator':      ('textList', 'oai_ddi:codeBook/stdyDscr/citation/rspStmt/AuthEnty/text()'),  # noqa
-#         'subject':      ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/subject/keyword/text()'),  # noqa
-#         'description':  ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/abstract/text()'),  # noqa
-#         'publisher':    ('textList', 'oai_ddi:codeBook/stdyDscr/citation/distStmt/contact/text()'),  # noqa
-#         'contributor':  ('textList', 'oai_ddi:codeBook/stdyDscr/citation/contributor/text()'),  # noqa
-#         'date':         ('textList', 'oai_ddi:codeBook/stdyDscr/citation/prodStmt/prodDate/text()'),  # noqa
-#         'type':         ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/dataKind/text()'),  # noqa
-#         'format':       ('textList', 'oai_ddi:codeBook/fileDscr/fileType/text()'),  # noqa
-#         'identifier':   ('textList', "oai_ddi:codeBook/stdyDscr/citation/titlStmt/IDNo/text()"),  # noqa
-#         'source':       ('textList', 'oai_ddi:codeBook/stdyDscr/dataAccs/setAvail/accsPlac/@URI'),  # noqa
-#         'language':     ('textList', 'oai_ddi:codeBook/@xml:lang'),  # noqa
-#         'tempCoverage': ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/timePrd/text()'),  # noqa
-#         'geoCoverage':  ('textList', 'oai_ddi:codeBook/stdyDscr/stdyInfo/sumDscr/geogCover/text()'),  # noqa
-#         'rights':       ('textList', 'oai_ddi:codeBook/stdyInfo/citation/prodStmt/copyright/text()')   # noqa
     mapping = {
         'id': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo'),  # noqa
         'name': FirstInOrderAttribute([
@@ -236,6 +240,79 @@ class DdiCkanMetadata(CkanMetadata):
         'title': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"  # noqa
         ),
+        'abbreviation': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:altTitl"  # noqa
+        ),
+        'study_type': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
+        ),
+        'series_name': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt/ddi:serName"  # noqa
+        ),
+        'series_info': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt/ddi:serInfo"  # noqa
+        ),
+        'id_number': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"  # noqa
+        ),
+        'description': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
+        ),
+        'production_type': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
+        ),
+        'abstract': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
+        ),
+        'kind_of_data': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:dataKind"  # noqa
+        ),
+        'unit_of_analysis': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:anlyUnit"  # noqa
+        ),
+        'description_of_scope': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
+        ),
+        'country': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:nation"  # noqa
+        ),
+        'geographic_coverage': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:geogCover"  # noqa
+        ),
+        'time_period_covered': XPathMultiTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:timePrd",  # noqa
+            separator=', '
+        ),
+        'universe': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:universe"  # noqa
+        ),
+        'primary_investigator': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty"  # noqa
+        ),
+        'other_producers': XPathMultiTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId",  # noqa
+            separator=', '
+        ),
+        'funding': XPathMultiTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg",  # noqa
+            separator=', '
+        ),
+        'sampling_procedure': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:sampProc"  # noqa
+        ),
+        'data_collection_dates': XPathMultiTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:collDate",  # noqa
+            separator=', '
+        ),
+        'access_authority': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:contact"  # noqa
+        ),
+        'citation_requirement': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions"  # noqa
+        ),
+        'contact_persons': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
+        ),
         'url': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/ddi:@URI"  # noqa
         ),
@@ -247,17 +324,21 @@ class DdiCkanMetadata(CkanMetadata):
             separator=', '
         ),
         'author_email': StringAttribute(''),
-        'maintainer': StringAttribute(''),
-        'maintainer_email': StringAttribute(''),
+        'maintainer': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
+        ),
+        'maintainer_email': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/ddi:@email"  # noqa
+        ),
         'license_url': XPathTextAttribute(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
-        'version': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:prodDate'),  # noqa
+        'version': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:version'),  # noqa
         'notes': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:notes"  # noqa
         ),
-        'tags': ArrayAttribute([
-            XPathMultiTextAttribute(
+        'tags': ArrayDictNameAttribute([
+            XPathMultiAttribute(
                 "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword"  # noqa
             )
         ]),
