@@ -46,6 +46,14 @@ paster --plugin=ckanext-ddi harvester fetch_consumer -c development.ini &
 paster --plugin=ckanext-ddi harvester run -c development.ini
 ```
 
+## Run import from command line
+
+```bash
+source /home/www-data/pyenv/bin/activate
+paster --plugin=ckanext-ddi ddi import /home/www-data/my-ddi.xml -c development.ini
+paster --plugin=ckanext-ddi ddi import http://domain.com/path/to/ddi -c development.ini
+```
+
 ## Development
 
 This CKAN extensions uses flake8 to ensure basic code quality.

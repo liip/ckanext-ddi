@@ -1,8 +1,10 @@
 import ckan.lib.cli
 import sys
+import json
 from pprint import pprint
 
 from ckanext.ddi.importer import ddiimporter
+from ckanext.ddi.plugins import get_ddi_config
 
 import logging
 log = logging.getLogger(__name__)
@@ -17,10 +19,13 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
         paster --plugin=ckanext-ddi <command> -c <path to config file>
 
         # Show this help
-        paster ddi help
+        paster --plugin=ckanext-ddi ddi help
+
+        # Show current configuration
+        paster --plugin=ckanext-ddi ddi config
 
         # Import datasets
-        paster ddi import <path_or_url>
+        paster --plugin=ckanext-ddi ddi import <path_or_url>
 
     '''
     summary = __doc__.split('\n')[0]
@@ -31,6 +36,7 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
         self._load_config()
         options = {
             'import': self.importCmd,
+            'config': self.configCmd,
             'help': self.helpCmd,
         }
 
@@ -43,6 +49,10 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
 
     def helpCmd(self):
         print self.__doc__
+
+    def configCmd(self):
+        config_dict = get_ddi_config()
+        pprint(json.loads(json.dumps(config_dict)))
 
     def importCmd(self, path_or_url=None):
         if path_or_url is None:
