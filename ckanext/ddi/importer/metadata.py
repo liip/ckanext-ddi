@@ -85,11 +85,9 @@ class XPathMultiTextAttribute(XPathMultiAttribute):
         values = super(XPathMultiTextAttribute, self).get_value(**kwargs)
         return_values = []
         for value in values:
-            if (
-                hasattr(value, 'text')
-                and value.text is not None
-                and value.text.strip() != ''
-            ):
+            if (hasattr(value, 'text') and
+                    value.text is not None and
+                    value.text.strip() != ''):
                 return_values.append(value.text.strip())
         return return_values
 
