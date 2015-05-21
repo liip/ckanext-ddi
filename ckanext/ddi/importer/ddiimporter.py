@@ -53,6 +53,8 @@ class DdiImporter(HarvesterBase):
             else:
                 del pkg_dict['id']
                 registry.call_action('package_create', pkg_dict)
+
+            pprint(pkg_dict)
         except:
             traceback.print_exc()
 

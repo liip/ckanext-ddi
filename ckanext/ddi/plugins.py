@@ -4,6 +4,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 import yaml
 from collections import OrderedDict
+from importer import ddiimporter
 
 import logging
 from pylons import config
@@ -51,6 +52,37 @@ def get_package_dict(dataset_id):
     user = tk.get_action('get_site_user')({}, {})
     context = {'user': user['name']}
     return tk.get_action('package_show')(context, {'id': dataset_id})
+
+
+def import_from_xml():
+    importer = ddiimporter.DdiImporter
+    importer.run(
+        url='http://microdata.statistics.gov.rw/index.php/catalog/ddi/26'
+    )
+
+
+class DdiImport(plugins.SingletonPlugin):
+    plugins.implements(plugins.IRoutes)
+    plugins.implements(plugins.IConfigurer)
+
+    def before_map(self, map):
+        map.connect(
+            '/dataset/import',
+            controller='ckanext.ddi.controllers:ImportFromXml',
+            action='import_form'
+        )
+        map.connect(
+            '/dataset/import2',
+            controller='ckanext.ddi.controllers:ImportFromXml',
+            action='run_import'
+        )
+        return map
+
+    def after_map(self, map):
+        return map
+
+    def update_config(self, config):
+        tk.add_template_directory(config, 'templates')
 
 
 class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
@@ -141,7 +173,8 @@ class DdiTheme(plugins.SingletonPlugin, tk.DefaultDatasetForm):
         return {
             'ddi_theme_get_ddi_config': get_ddi_config,
             'ddi_theme_get_vocabulary_values': get_vocabulary_values,
-            'ddi_theme_get_package_dict': get_package_dict
+            'ddi_theme_get_package_dict': get_package_dict,
+            'ddi_theme_import_from_xml': import_from_xml
         }
 
     def is_fallback(self):
