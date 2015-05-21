@@ -1,11 +1,9 @@
+import requests
+import traceback
 from pprint import pprint
 
-import requests
-
 from ckan.lib.munge import munge_title_to_name
-
 from ckanext.harvest.harvesters import HarvesterBase
-
 from ckanext.ddi.importer import metadata
 
 import ckanapi
@@ -38,15 +36,13 @@ class DdiImporter(HarvesterBase):
             })
             pkg_dict['resources'] = resources
 
+        pkg_dict = self.cleanup_pkg_dict(pkg_dict)
+        self.insert_or_update_pkg(pkg_dict)
+
+    def insert_or_update_pkg(self, pkg_dict):
         try:
             registry = ckanapi.LocalCKAN()
             pprint(pkg_dict)
-            if pkg_dict['name'] != '':
-                pkg_dict['name'] = munge_title_to_name(pkg_dict['name'])
-            else:
-                pkg_dict['name'] = munge_title_to_name(pkg_dict['title'])
-            if pkg_dict['url'] == '':
-                del pkg_dict['url']
             if pkg_dict['id'] and pkg_dict['id'] != '':
                 try:
                     registry.call_action('package_update', pkg_dict)
@@ -57,5 +53,13 @@ class DdiImporter(HarvesterBase):
                 del pkg_dict['id']
                 registry.call_action('package_create', pkg_dict)
         except:
-            import traceback
             traceback.print_exc()
+
+    def cleanup_pkg_dict(self, pkg_dict):
+        if pkg_dict['name'] != '':
+            pkg_dict['name'] = munge_title_to_name(pkg_dict['name'])
+        else:
+            pkg_dict['name'] = munge_title_to_name(pkg_dict['title'])
+        if pkg_dict['url'] == '':
+            del pkg_dict['url']
+        return pkg_dict
