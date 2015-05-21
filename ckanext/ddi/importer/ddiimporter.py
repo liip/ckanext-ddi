@@ -48,6 +48,7 @@ class DdiImporter(HarvesterBase):
                     registry.call_action('package_update', pkg_dict)
                 except ckanapi.NotFound:
                     del pkg_dict['id']
+                    pkg_dict['name'] = self._gen_new_name(pkg_dict['name'])
                     registry.call_action('package_create', pkg_dict)
             else:
                 del pkg_dict['id']
