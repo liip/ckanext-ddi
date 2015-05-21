@@ -56,7 +56,9 @@ def get_package_dict(dataset_id):
 
 def import_from_xml():
     importer = ddiimporter.DdiImporter
-    importer.run(url='http://microdata.statistics.gov.rw/index.php/catalog/ddi/26')
+    importer.run(
+        url='http://microdata.statistics.gov.rw/index.php/catalog/ddi/26'
+    )
 
 
 class DdiImport(plugins.SingletonPlugin):
@@ -64,8 +66,16 @@ class DdiImport(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
 
     def before_map(self, map):
-        map.connect('/dataset/import', controller='ckanext.ddi.controllers:ImportFromXml', action='import_form')
-        map.connect('/dataset/import2', controller='ckanext.ddi.controllers:ImportFromXml', action='run_import')
+        map.connect(
+            '/dataset/import',
+            controller='ckanext.ddi.controllers:ImportFromXml',
+            action='import_form'
+        )
+        map.connect(
+            '/dataset/import2',
+            controller='ckanext.ddi.controllers:ImportFromXml',
+            action='run_import'
+        )
         return map
 
     def after_map(self, map):

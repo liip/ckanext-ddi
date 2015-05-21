@@ -10,7 +10,7 @@ import ckan.model as model
 import ckan.lib.plugins
 import ckan.lib.render
 
-from ckan.common import OrderedDict, _, json, request, c, g, response
+from ckan.common import request, c
 from ckan.controllers.home import CACHE_PARAMETERS
 
 from ckanext.ddi.importer import ddiimporter
@@ -71,11 +71,12 @@ class ImportFromXml(PackageController):
             request.params.get('groups__0__id')
 
         form_snippet = self.package_form
-        form_vars = {'data': data, 'errors': errors,
-                     'error_summary': error_summary,
-                     'action': 'new',
-                     'dataset_type': package_type,
-                    }
+        form_vars = {
+            'data': data, 'errors': errors,
+            'error_summary': error_summary,
+            'action': 'new',
+            'dataset_type': package_type,
+        }
         c.errors_json = h.json.dumps(errors)
 
         self._setup_template_variables(context, {},
@@ -100,7 +101,7 @@ class ImportFromXml(PackageController):
 
         # Check whether upload is a file or a url
         # If it's a url, we pass in the url to the importer.run and call it
-        # If it's a file, check whether it's a valid XML and if not, return a message
+        # If it's a file, check whether it's a valid XML
         # If it is a proper XML, pass it into the importer.run and call it
 
         if 'upload' in request.params and request.params['upload']:
