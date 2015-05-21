@@ -238,14 +238,9 @@ class DdiCkanMetadata(CkanMetadata):
     """ Provides access to the DDI metadata """
     mapping = {
         'id': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo'),  # noqa
-        'name': FirstInOrderAttribute([
-            XPathTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:altTitl"  # noqa
-            ),
-            XPathTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"  # noqa
-            ),
-        ]),
+        'name': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"  # noqa
+        ),
         'title': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"  # noqa
         ),
