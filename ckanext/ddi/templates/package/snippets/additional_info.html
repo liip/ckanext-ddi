@@ -11,7 +11,21 @@
               <p class="fieldname">{{ _(ddi_config['fields'][section][field]['display']) }}</p>
               </td>
               <td>
-              <p class="metadata">{{ pkg[field] }}</p>
+                <p class="metadata">
+                  {% if ddi_config['fields'][section][field]['type'] == 'url' %}
+                    {% set display_field = ddi_config['fields'][section][field]['display_field'] %}
+                    {% set display_text = ddi_config['fields'][section][field]['display_text'] %}
+                    {% if display_field and display_field in pkg %}
+                        <a href="{{ pkg[field] }}">{{ pkg[display_field] }}</a>
+                    {% elif display_text %}
+                        <a href="{{ pkg[field] }}">{{ display_text }}</a>
+                    {% else %}
+                        <a href="{{ pkg[field] }}">{{ pkg[field] }}</a>
+                    {% endif %}
+                  {% else %}
+                    {{ pkg[field] }}
+                  {% endif %}
+                </p>
               </td>
             <tr>
           {% endif %}

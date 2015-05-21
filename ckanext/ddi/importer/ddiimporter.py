@@ -1,11 +1,9 @@
+import requests
+import traceback
 from pprint import pprint
 
-import requests
-
 from ckan.lib.munge import munge_title_to_name
-
 from ckanext.harvest.harvesters import HarvesterBase
-
 from ckanext.ddi.importer import metadata
 
 import ckanapi
@@ -26,21 +24,25 @@ class DdiImporter(HarvesterBase):
             r = requests.get(url)
             xml_file = r.text
 
-            # fd, temp_path = tempfile.mkstemp()
-            # fd.write(xml_file.data)
             pkg_dict = ckan_metadata.load(xml_file)
-            # os.close(fd)
-            # os.remove(temp_path)
+            if pkg_dict['url'] == '':
+                pkg_dict['url'] = url
 
+            resources = []
+            resources.append({
+                'url': url,
+                'name': pkg_dict['title'],
+                'format': 'xml'
+            })
+            pkg_dict['resources'] = resources
+
+        pkg_dict = self.cleanup_pkg_dict(pkg_dict)
+        self.insert_or_update_pkg(pkg_dict)
+
+    def insert_or_update_pkg(self, pkg_dict):
         try:
             registry = ckanapi.LocalCKAN()
             pprint(pkg_dict)
-            if pkg_dict['name'] != '':
-                pkg_dict['name'] = munge_title_to_name(pkg_dict['name'])
-            else:
-                pkg_dict['name'] = munge_title_to_name(pkg_dict['title'])
-            if pkg_dict['url'] == '':
-                del pkg_dict['url']
             if pkg_dict['id'] and pkg_dict['id'] != '':
                 try:
                     registry.call_action('package_update', pkg_dict)
@@ -51,5 +53,13 @@ class DdiImporter(HarvesterBase):
                 del pkg_dict['id']
                 registry.call_action('package_create', pkg_dict)
         except:
-            import traceback
             traceback.print_exc()
+
+    def cleanup_pkg_dict(self, pkg_dict):
+        if pkg_dict['name'] != '':
+            pkg_dict['name'] = munge_title_to_name(pkg_dict['name'])
+        else:
+            pkg_dict['name'] = munge_title_to_name(pkg_dict['title'])
+        if pkg_dict['url'] == '':
+            del pkg_dict['url']
+        return pkg_dict
