@@ -10,7 +10,7 @@ import ckan.model as model
 import ckan.lib.plugins
 import ckan.lib.render
 
-from ckan.common import request, c
+from ckan.common import _, request, c
 from ckan.controllers.home import CACHE_PARAMETERS
 
 from ckanext.ddi.importer import ddiimporter
