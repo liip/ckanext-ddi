@@ -37,7 +37,7 @@ lookup_package_plugin = ckan.lib.plugins.lookup_package_plugin
 class ImportFromXml(PackageController):
     package_form = 'package/import_package_form.html'
 
-    def new(self, data=None, errors=None, error_summary=None):
+    def import_form(self, data=None, errors=None, error_summary=None):
         package_type = self._guess_package_type(True)
 
         context = {'model': model, 'session': model.Session,
@@ -95,9 +95,14 @@ class ImportFromXml(PackageController):
         # If it's a file, check whether it's a valid XML and if not, return a message
         # If it is a proper XML, pass it into the importer.run and call it
 
-        if 'url' in request.params:
+        if 'url' in request.params and request.params['url']:
             log.debug(request.params['url'])
-            importer.run(url=request.params['url'])
+            id = importer.run(url=request.params['url'])
+        elif 'upload' in request.params and request.params['upload']:
+            log.debug(request.params['upload'])
+            id = importer.run(file_path=request.params['upload'])
+
+        redirect(h.url_for(controller='package', action='read', id=id))
 
         package_type = self._guess_package_type(True)
 
