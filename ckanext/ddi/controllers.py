@@ -70,31 +70,20 @@ class ImportFromXml(PackageController):
         data['group_id'] = request.params.get('group') or \
             request.params.get('groups__0__id')
 
-        form_snippet = self.package_form
-        form_vars = {
-            'data': data, 'errors': errors,
-            'error_summary': error_summary,
-            'action': 'new',
-            'dataset_type': package_type,
-        }
+        vars = {'data': data, 'errors': errors,
+                'error_summary': error_summary,
+                'action': 'new'}
         c.errors_json = h.json.dumps(errors)
 
         self._setup_template_variables(context, {},
                                        package_type=package_type)
 
-        new_template = self._new_template(package_type)
-        c.form = ckan.lib.render.deprecated_lazy_render(
-            new_template,
-            form_snippet,
-            lambda: render(form_snippet, extra_vars=form_vars),
-            'use of c.form is deprecated. please see '
-            'ckan/templates/package/base_form_page.html for an example '
-            'of the new way to include the form snippet'
-            )
-        return render(new_template,
-                      extra_vars={'form_vars': form_vars,
-                                  'form_snippet': form_snippet,
-                                  'dataset_type': package_type})
+        if hasattr(self, 'package_form'):
+            c.form = render(self.package_form, extra_vars=vars)
+        else:
+            c.form = render(self._package_form(package_type=package_type),
+                            extra_vars=vars)
+        return render(self._new_template(package_type))
 
     def run_import(self, data=None, errors=None, error_summary=None):
         importer = ddiimporter.DdiImporter()
