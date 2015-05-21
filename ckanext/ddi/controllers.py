@@ -103,53 +103,11 @@ class ImportFromXml(PackageController):
         # If it's a file, check whether it's a valid XML and if not, return a message
         # If it is a proper XML, pass it into the importer.run and call it
 
-        if 'url' in request.params and request.params['url']:
-            log.debug(request.params['url'])
-            id = importer.run(url=request.params['url'])
-        elif 'upload' in request.params and request.params['upload']:
-            log.debug(request.params['upload'])
+        if 'upload' in request.params and request.params['upload']:
+            log.debug('upload = ' + request.params['upload'])
             id = importer.run(file_path=request.params['upload'])
+        elif 'url' in request.params and request.params['url']:
+            log.debug('url = ' + request.params['url'])
+            id = importer.run(url=request.params['url'])
 
         redirect(h.url_for(controller='package', action='read', id=id))
-
-        package_type = self._guess_package_type(True)
-
-        context = {'model': model, 'session': model.Session,
-                   'user': c.user or c.author, 'auth_user_obj': c.userobj}
-
-        # Package needs to have a organization group in the call to
-        # check_access and also to save it
-        try:
-            check_access('package_create', context)
-        except NotAuthorized:
-            abort(401, _('Unauthorized to create a package'))
-
-        data = data or clean_dict(dict_fns.unflatten(tuplize_dict(parse_params(
-            request.params, ignore_keys=CACHE_PARAMETERS))))
-
-        # return request.params['url']
-
-        errors = errors or {}
-        error_summary = error_summary or {}
-
-        # if we are creating from a group then this allows the group to be
-        # set automatically
-        data['group_id'] = request.params.get('group') or \
-            request.params.get('groups__0__id')
-
-        vars = {'data': data, 'errors': errors,
-                'error_summary': error_summary,
-                'action': 'new'}
-        c.errors_json = h.json.dumps(errors)
-
-        self._setup_template_variables(context, {},
-                                       package_type=package_type)
-
-        # TODO: This check is to maintain backwards compatibility with the
-        # old way of creating custom forms. This behaviour is now deprecated.
-        if hasattr(self, 'package_form'):
-            c.form = render(self.package_form, extra_vars=vars)
-        else:
-            c.form = render(self._package_form(package_type=package_type),
-                            extra_vars=vars)
-        return render(self._new_template(package_type))
