@@ -26,11 +26,17 @@ class DdiImporter(HarvesterBase):
             r = requests.get(url)
             xml_file = r.text
 
-            # fd, temp_path = tempfile.mkstemp()
-            # fd.write(xml_file.data)
             pkg_dict = ckan_metadata.load(xml_file)
-            # os.close(fd)
-            # os.remove(temp_path)
+            if pkg_dict['url'] == '':
+                pkg_dict['url'] = url
+
+            resources = []
+            resources.append({
+                'url': url,
+                'name': pkg_dict['title'],
+                'format': 'xml'
+            })
+            pkg_dict['resources'] = resources
 
         try:
             registry = ckanapi.LocalCKAN()
