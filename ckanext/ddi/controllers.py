@@ -111,4 +111,5 @@ class ImportFromXml(PackageController):
             log.debug('url = ' + request.params['url'])
             id = importer.run(url=request.params['url'])
 
+        h.flash_success(_("Dataset import from XML successfully completed!"))
         redirect(h.url_for(controller='package', action='read', id=id))
