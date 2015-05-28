@@ -67,8 +67,7 @@ class DdiImporter(HarvesterBase):
         if pkg_dict['url'] == '':
             del pkg_dict['url']
 
-        license = params.get('license', None)
-        if license is not None:
+        if params is not None and params.get(license, None) is not None:
             pkg_dict['license_id'] = params['license']
         else:
             pkg_dict['license_id'] = config.get('ckanext.ddi.default_license')
