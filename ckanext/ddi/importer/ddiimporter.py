@@ -38,7 +38,7 @@ class DdiImporter(HarvesterBase):
             pkg_dict['resources'] = resources
 
         pkg_dict = self.improve_pkg_dict(pkg_dict, params)
-        self.insert_or_update_pkg(pkg_dict)
+        return self.insert_or_update_pkg(pkg_dict)
 
     def insert_or_update_pkg(self, pkg_dict):
         try:
@@ -56,6 +56,7 @@ class DdiImporter(HarvesterBase):
                 registry.call_action('package_create', pkg_dict)
 
             pprint(pkg_dict)
+            return pkg_dict['name']
         except:
             traceback.print_exc()
 

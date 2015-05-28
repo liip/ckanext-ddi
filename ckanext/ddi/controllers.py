@@ -97,19 +97,31 @@ class ImportFromXml(PackageController):
                                   'dataset_type': package_type})
 
     def run_import(self, data=None, errors=None, error_summary=None):
-        importer = ddiimporter.DdiImporter()
+        pkg_id = None
+        try:
+            importer = ddiimporter.DdiImporter()
 
-        # Check whether upload is a file or a url
-        # If it's a url, we pass in the url to the importer.run and call it
-        # If it's a file, check whether it's a valid XML
-        # If it is a proper XML, pass it into the importer.run and call it
+            # Check whether upload is a file or a url
+            # If it's a url, we pass in the url to the importer.run and call it
+            # If it's a file, check whether it's a valid XML
+            # If it is a proper XML, pass it into the importer.run and call it
 
-        if 'upload' in request.params and request.params['upload']:
-            log.debug('upload = ' + request.params['upload'])
-            id = importer.run(file_path=request.params['upload'])
-        elif 'url' in request.params and request.params['url']:
-            log.debug('url = ' + request.params['url'])
-            id = importer.run(url=request.params['url'])
+            if 'upload' in request.params and request.params['upload']:
+                log.debug('upload = ' + request.params['upload'])
+                pkg_id = importer.run(file_path=request.params['upload'])
+            elif 'url' in request.params and request.params['url']:
+                log.debug('url = ' + request.params['url'])
+                pkg_id = importer.run(url=request.params['url'])
 
-        h.flash_success(_("Dataset import from XML successfully completed!"))
-        redirect(h.url_for(controller='package', action='read', id=id))
+            h.flash_success(
+                _("Dataset import from XML successfully completed!")
+            )
+        except Exception as e:
+            h.flash_error(
+                _("Dataset import from XML failed: %s" % str(e))
+            )
+
+        if pkg_id is not None:
+            redirect(h.url_for(controller='package', action='read', id=id))
+        else:
+            redirect(h.url_for(controller='package', action='search'))
