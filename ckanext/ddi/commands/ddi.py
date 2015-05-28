@@ -25,7 +25,7 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
         paster --plugin=ckanext-ddi ddi config
 
         # Import datasets
-        paster --plugin=ckanext-ddi ddi import <path_or_url>
+        paster --plugin=ckanext-ddi ddi import <path_or_url> <license>
 
     '''
     summary = __doc__.split('\n')[0]
@@ -54,18 +54,27 @@ class DdiCommand(ckan.lib.cli.CkanCommand):
         config_dict = get_ddi_config()
         pprint(json.loads(json.dumps(config_dict)))
 
-    def importCmd(self, path_or_url=None):
+    def importCmd(self, path_or_url=None, license=None):
         if path_or_url is None:
             print "Argument 'path_or_url' must be set"
             self.helpCmd()
             sys.exit(1)
         try:
-            pprint(path_or_url)
             importer = ddiimporter.DdiImporter()
             if path_or_url.startswith('http:'):
-                importer.run(url=path_or_url)
+                importer.run(
+                    url=path_or_url,
+                    params={
+                        'license': license
+                    }
+                )
             else:
-                importer.run(file_path=path_or_url)
+                importer.run(
+                    file_path=path_or_url,
+                    params={
+                        'license': license
+                    }
+                )
         except Exception:
             import traceback
             traceback.print_exc()

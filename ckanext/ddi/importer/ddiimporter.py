@@ -9,11 +9,12 @@ from ckanext.ddi.importer import metadata
 import ckanapi
 
 import logging
+from pylons import config
 log = logging.getLogger(__name__)
 
 
 class DdiImporter(HarvesterBase):
-    def run(self, file_path=None, url=None):
+    def run(self, file_path=None, url=None, params=None):
         pkg_dict = None
         ckan_metadata = metadata.DdiCkanMetadata()
         if file_path is not None:
@@ -36,7 +37,7 @@ class DdiImporter(HarvesterBase):
             })
             pkg_dict['resources'] = resources
 
-        pkg_dict = self.cleanup_pkg_dict(pkg_dict)
+        pkg_dict = self.improve_pkg_dict(pkg_dict, params)
         self.insert_or_update_pkg(pkg_dict)
 
     def insert_or_update_pkg(self, pkg_dict):
@@ -58,11 +59,17 @@ class DdiImporter(HarvesterBase):
         except:
             traceback.print_exc()
 
-    def cleanup_pkg_dict(self, pkg_dict):
+    def improve_pkg_dict(self, pkg_dict, params):
         if pkg_dict['name'] != '':
             pkg_dict['name'] = munge_title_to_name(pkg_dict['name'])
         else:
             pkg_dict['name'] = munge_title_to_name(pkg_dict['title'])
         if pkg_dict['url'] == '':
             del pkg_dict['url']
+
+        license = params.get('license', None)
+        if license is not None:
+            pkg_dict['license_id'] = params['license']
+        else:
+            pkg_dict['license_id'] = config.get('ckanext.ddi.default_license')
         return pkg_dict
