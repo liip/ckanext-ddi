@@ -9,19 +9,10 @@ DDI extension for CKAN for the Worldbank.
 
 Planned Features:
 
-* Harvest DDI data
+* Import DDI data
 * Manage DDI data manually via the CKAN frontend
 * Upload DDI files (XML) to a CKAN instance
-* Provide data from CKAN as DDI
 
-## Usage
-
-This plugin provides the possibility to import DDI XML files using a paster command.
-The file can either be loaded from a local path or a publicly available URL.
-
-```bash
-paster --plugin=ckanext-ddi ddi import <path_or_url> -c <path to config file>
-```
 
 ## Installation
 
@@ -37,21 +28,83 @@ python setup.py develop
 
 Make sure to add `ddi` and `ddi_harvester` to `ckan.plugins` in your config file.
 
-## Run harvester
+## Usage
+Data can be imported either via command line or using the web interface.
+
+### Web interface
+If you are logged in and you have the appropriate permissions, you find a new button "Import Dataset from XML" on the dataset page.
+
+### Run import from command line
+This plugin provides the possibility to import DDI XML files using a paster command.
 
 ```bash
 source /home/www-data/pyenv/bin/activate
-paster --plugin=ckanext-ddi harvester gather_consumer -c development.ini &
-paster --plugin=ckanext-ddi harvester fetch_consumer -c development.ini &
-paster --plugin=ckanext-ddi harvester run -c development.ini
+paster --plugin=ckanext-ddi ddi import <path_or_url> [<license>] -c <path to config file>
 ```
 
-## Run import from command line
+* `<path_or_url>` is a required parameter and - as the name implies - it can can either be a local file or a publicly accessible URL.
+* `<license>` is an optional parameter to specify the license of the dataset. Ideally this is a value from the [configured license group file](http://docs.ckan.org/en/943-writing-extensions-tutorial/configuration.html#licenses-group-url).
+
+## Configuration
+
+### CKAN configuration (production.ini)
+Two options are available:
 
 ```bash
-source /home/www-data/pyenv/bin/activate
-paster --plugin=ckanext-ddi ddi import /home/www-data/my-ddi.xml -c development.ini
-paster --plugin=ckanext-ddi ddi import http://domain.com/path/to/ddi -c development.ini
+ckanext.ddi.config_file = /path/to/my/config.yml
+ckanext.ddi.default_license = CC0-1.0
+```
+
+The `config_file` is simply the path to the DDI-specific configuration of this extension (see below).
+The `default_license` allows a user to configure a license that is used for all DDI imports, if the license is not specified explicitly.
+
+### ckanext-ddi specific configuration (config.yml)
+The display and structure of the DDI fields can be configured individually. A separate YAML config file is used for that.
+
+There are 3 sections:
+
+1. `sections`: describes different section, used to group together `fields`
+2. `vocabularies`: describes availables controlled vocabularies, that can be referenced
+3. `fields`: describes all fields, their type and how they are displayed 
+
+Example:
+
+```bash
+fields:
+    identification:
+        title:
+            type: text
+            visible: False
+            display: Title
+        url:
+            type: url
+            display_field: title
+            visible: True
+            display: Source
+    overview:
+        abstract:
+            type: markdown
+            visible: True
+            display: Abstract
+        kind_of_data:
+            type: vocabulary
+            visible: True
+            display: Kind of Data
+
+vocabularies:
+    kind_of_data:
+        - Sample survey data [ssd]
+        - Census/enumeration data [cen]
+        - Administrative records data [adm]
+        - Aggregate data [agg]
+        - Clinical data [cli]
+        - Event/transaction data [evn]
+        - Observation data/ratings [obs]
+        - Process-produced data [pro]
+
+sections:
+    identification: Identification
+    overview: Overview
 ```
 
 ## Development
