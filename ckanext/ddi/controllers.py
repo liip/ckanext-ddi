@@ -122,6 +122,6 @@ class ImportFromXml(PackageController):
             )
 
         if pkg_id is not None:
-            redirect(h.url_for(controller='package', action='read', id=id))
+            redirect(h.url_for(controller='package', action='read', id=pkg_id))
         else:
             redirect(h.url_for(controller='package', action='search'))
