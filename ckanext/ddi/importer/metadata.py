@@ -259,6 +259,9 @@ class DdiCkanMetadata(CkanMetadata):
         'description': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
+        'production_date': XPathTextAttribute(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
+        ),
         'production_type': XPathTextAttribute(
             "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
         ),
