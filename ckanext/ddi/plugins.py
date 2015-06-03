@@ -49,9 +49,11 @@ def get_vocabulary_values(vocabulary):
 
 
 def get_package_dict(dataset_id):
-    user = tk.get_action('get_site_user')({}, {})
-    context = {'user': user['name']}
-    return tk.get_action('package_show')(context, {'id': dataset_id})
+    if dataset_id:
+        user = tk.get_action('get_site_user')({}, {})
+        context = {'user': user['name']}
+        return tk.get_action('package_show')(context, {'id': dataset_id})
+    return None
 
 
 def import_from_xml():
