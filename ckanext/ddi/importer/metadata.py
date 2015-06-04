@@ -105,6 +105,26 @@ class CombinedValue(Value):
                 value = value + attribute.get_value(**kwargs) + separator
         return value.strip(separator)
 
+class ZipValue(Value):
+    def get_value(self, **kwargs):
+        self.env.update(kwargs)
+        values = []
+        separator = self.env['separator'] if 'separator' in self.env else ' '
+
+        if 'zip_separator' in self.env:
+            zip_separator = self.env['zip_separator']
+        else: 
+            zip_separator = ' '
+
+        for attribute in self._config:
+            values.append(attribute.get_value(**kwargs))
+        
+        zip_values = zip(*values)
+        value = ''
+        for zip_value in zip_values:
+            value = value + separator + zip_separator.join(list(zip_value))
+
+        return value.strip(separator)
 
 
 class MultiValue(Value):
@@ -322,34 +342,51 @@ class DdiCkanMetadata(CkanMetadata):
             ),
             separator=', '
         ),
-        'sampling_procedure': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:sampProc"  # noqa
+        'sampling_procedure': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc"  # noqa
         ),
-        'data_collection_dates': ArrayTextAttribute(
-            XPathMultiTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:collDate",  # noqa
-            ),
+        'data_collection_dates': CombinedValue(
+            [
+                ZipValue(
+                    [
+                        XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='start']/@date",  # noqa
+                        ),
+                        XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@date",  # noqa
+                        ),
+                    ],
+                    zip_separator=' - ',
+                    separator=', '
+                ),
+                ArrayTextValue(
+                    XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='single' or not(@event)]/@date",  # noqa
+                    ),
+                    separator=', '
+                ),
+            ],
             separator=', '
         ),
-        'access_authority': XPathTextAttribute(
+        'access_authority': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:contact"  # noqa
         ),
-        'conditions': XPathTextAttribute(
+        'conditions': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions"  # noqa
         ),
-        'citation_requirement': XPathTextAttribute(
+        'citation_requirement': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:citReq"  # noqa
         ),
-        'contact_persons': XPathTextAttribute(
+        'contact_persons': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
-        'url': XPathTextAttribute(
+        'url': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/@URI"  # noqa
         ),
-        'author': CombinedAttribute(
+        'author': CombinedValue(
             [
-                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
-                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
+                XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
+                XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
             ],
             separator=', '
         ),
