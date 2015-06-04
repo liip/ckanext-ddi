@@ -105,6 +105,7 @@ class CombinedValue(Value):
                 value = value + attribute.get_value(**kwargs) + separator
         return value.strip(separator)
 
+
 class ZipValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
@@ -113,12 +114,12 @@ class ZipValue(Value):
 
         if 'zip_separator' in self.env:
             zip_separator = self.env['zip_separator']
-        else: 
+        else:
             zip_separator = ' '
 
         for attribute in self._config:
             values.append(attribute.get_value(**kwargs))
-        
+
         zip_values = zip(*values)
         value = ''
         for zip_value in zip_values:
