@@ -89,6 +89,8 @@ class XPathMultiTextValue(XPathMultiValue):
                     value.text is not None and
                     value.text.strip() != ''):
                 return_values.append(value.text.strip())
+            elif isinstance(value, basestring):
+                return_values.append(value)
         return return_values
 
 
