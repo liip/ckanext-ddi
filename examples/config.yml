@@ -1,0 +1,176 @@
+sections:
+    identification: Identification
+    version: Version
+    overview: Overview
+    scope: Scope
+    coverage: Coverage
+    producers_and_sponsors: Producers and Sponsors
+    sampling: Sampling
+    data_collection: Data Collection
+    data_appraisal: Data Appraisal
+    contacts: Contacts
+
+fields:
+    identification:
+        title:
+            type: text
+            visible: False
+            display: Title
+        url:
+            type: url
+            visible: True
+            display: URL
+        abbreviation:
+            type: text
+            visible: True
+            display: Abbreviation
+        study_type:
+            type: vocabulary
+            visible: True
+            display: Study Type
+        series_info:
+            type: text
+            visible: True
+            display: Series Information
+        id_number:
+            type: text
+            visible: True
+            display: ID Number
+        url:
+            type: url
+            display_field: title
+            visible: True
+            display: Source
+    version:
+        version:
+            type: text
+            visible: True
+            display: Description
+        production_date:
+            type: text
+            visible: True
+            display: Production Date
+        version_notes:
+            type: markdown
+            visible: True
+            display: Notes
+    overview:
+        abstract:
+            type: markdown
+            visible: True
+            display: Abstract
+        kind_of_data:
+            type: vocabulary
+            visible: True
+            display: Kind of Data
+        unit_of_analysis:
+            type: text
+            visible: True
+            display: Unit of Analysis
+    scope:
+        description_of_scope:
+            type: markdown
+            visible: True
+            display: Description of Scope
+    coverage:
+        country:
+            type: text
+            visible: True
+            display: Country
+        geographic_coverage:
+            type: text
+            visible: True
+            display: Geographic Coverage
+        universe:
+            type: text
+            visible: True
+            display: Universe
+    producers_and_sponsors:
+        primary_investigator:
+            type: text
+            visible: True
+            display: Primary Investigator
+        other_producers:
+            type: text
+            visible: True
+            display: Other Producers
+        funding:
+            type: text
+            visible: True
+            display: Funding
+    sampling:
+        sampling_procedure:
+            type: markdown
+            visible: True
+            display: Sampling Procedure
+    data_collection:
+        data_collection_dates:
+            type: text
+            visible: True
+            display: Dates of Data Collection
+    data_appraisal:
+        access_authority:
+            type: text
+            visible: True
+            display: Access Authority
+        citation_requirement:
+            type: text
+            visible: True
+            display: Citation Requirement
+    contacts:
+        contact_persons:
+            type: text
+            visible: True
+            display: Contact Persons
+
+vocabularies:
+    study_type:
+        - 1-2-3 Survey, phase 1 [hh/123-1]
+        - 1-2-3 Survey, phase 2 [hh/123-2]
+        - 1-2-3 Survey, phase 3 [hh/123-3]
+        - Administrative Records, Health (ad/hea]
+        - Administrative Records, Education (ad/edu]
+        - Administrative Records, Other (ad/oth]
+        - Agricultural Census [ag/census]
+        - Agricultural Survey [ag/oth]
+        - Child Labor Survey [hh/cls]
+        - Core Welfare Indicators Questionnaire [hh/cwiq]
+        - Demographic and Health Survey [hh/dhs]
+        - Demographic and Health Survey, Round 1 [hh/dhs-1]
+        - Demographic and Health Survey, Round 2 [hh/dhs-2]
+        - Demographic and Health Survey, Round 3 [hh/dhs-3]
+        - Demographic and Health Survey, Round 4 [hh/dhs-4]
+        - Demographic and Health Survey, Interim [hh/dhs-int]
+        - Demographic and Health Survey, Special [hh/dhs-sp]
+        - Enterprise Survey [en/oth]
+        - Enterprise Census [en/census]
+        - Income/Expenditure/Household Survey [hh/ies]
+        - Informal Sector Survey [hh/iss]
+        - Integrated Survey (non-LSMS) [hh/is]
+        - Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]
+        - Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]
+        - Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]
+        - Labor Force Survey [hh/lfs]
+        - Living Standards Measurement Study [hh/lsms]
+        - Other Household Health Survey [hh/hea]
+        - Other Household Survey [hh/oth]
+        - Price Survey [hh/prc]
+        - Priority Survey (hh/ps]
+        - Population and Housing Census [hh/popcen]
+        - Sample Frame, Households [sf/hh]
+        - Sample Frame, Enterprises [sf/en]
+        - Service Provision Assessments [hh/spa]
+        - Socio-Economic/Monitoring Survey [hh/sems]
+        - Statistical Info. &amp; Monitoring Prog. [hh/simpoc]
+        - World Fertility Survey [hh/wfs]
+        - World Health Survey [hh/whs]
+    kind_of_data:
+        - Sample survey data [ssd]
+        - Census/enumeration data [cen]
+        - Administrative records data [adm]
+        - Aggregate data [agg]
+        - Clinical data [cli]
+        - Event/transaction data [evn]
+        - Observation data/ratings [obs]
+        - Process-produced data [pro]
+        - Time budget diaries [tbd]
