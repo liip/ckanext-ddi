@@ -190,6 +190,7 @@ class CkanMetadata(object):
             'license_url',
             'copyright',
             'version',
+            'version_notes',
             'notes',
             'tags',
             'abbreviation',
@@ -198,6 +199,7 @@ class CkanMetadata(object):
             'id_number',
             'description',
             'production_type',
+            'production_date',
             'abstract',
             'kind_of_data',
             'unit_of_analysis',
@@ -366,6 +368,7 @@ class DdiCkanMetadata(CkanMetadata):
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
         'version': XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:version'),  # noqa
+        'version_notes': XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:notes'),  # noqa
         'notes': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:notes"  # noqa
         ),
