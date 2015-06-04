@@ -4,6 +4,8 @@
 
 {% block package_metadata_fields %}
 
+<fieldset>
+<legend>{{ _('DDI metadata fields') }}</legend>
 {% for section in ddi_config['fields'] %}
   {% for field in ddi_config['fields'][section] %}
     {% if field != 'title' %}
@@ -31,5 +33,6 @@
     {% endif %}
   {% endfor %}
 {% endfor %}
+</fieldset>
 
 {% endblock %}

@@ -2,6 +2,9 @@
 
 {# Identification #}
 
+<fieldset>
+<legend>{{ _('CKAN metadata fields') }}</legend>
+
 {% block package_identification_fields_title %}
   {{ form.input('title', id='field-title', label=_('Title'), placeholder=_('eg. A descriptive title'), value=data.title, error=errors.title, classes=['control-full', 'control-large'], attrs={'data-module': 'slug-preview-target'}) }}
 {% endblock %}
@@ -109,5 +112,5 @@
       </div>
     </div>
   {% endif %}
-
+</fieldset>
 {% endblock %}
