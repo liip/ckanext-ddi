@@ -26,7 +26,7 @@ namespaces = {
 }
 
 
-class Attribute(object):
+class Value(object):
     def __init__(self, config, **kwargs):
         self._config = config
         self.env = kwargs
@@ -36,19 +36,19 @@ class Attribute(object):
         raise NotImplementedError
 
 
-class StringAttribute(Attribute):
+class StringValue(Value):
     def get_value(self, **kwargs):
         return self._config
 
 
-class XmlAttribute(Attribute):
+class XmlValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
         xml = self.env['xml']
         return etree.tostring(xml)
 
 
-class XPathAttribute(Attribute):
+class XPathValue(Value):
     def get_element(self, xml, xpath):
         return xml.xpath(xpath, namespaces=namespaces)[0]
 
@@ -60,7 +60,7 @@ class XPathAttribute(Attribute):
         log.debug("XPath: %s" % (xpath))
 
         try:
-            # this should probably return a XPathTextAttribute
+            # this should probably return a XPathTextValue
             value = self.get_element(xml, xpath)
         except Exception:
             log.debug('XPath not found: %s' % xpath)
@@ -68,31 +68,33 @@ class XPathAttribute(Attribute):
         return value
 
 
-class XPathMultiAttribute(XPathAttribute):
+class XPathMultiValue(XPathValue):
     def get_element(self, xml, xpath):
         return xml.xpath(xpath, namespaces=namespaces)
 
 
-class XPathTextAttribute(XPathAttribute):
+class XPathTextValue(XPathValue):
     def get_value(self, **kwargs):
-        value = super(XPathTextAttribute, self).get_value(**kwargs)
+        value = super(XPathTextValue, self).get_value(**kwargs)
         return value.text.strip() if hasattr(value, 'text') else value
 
 
-class XPathMultiTextAttribute(XPathMultiAttribute):
+class XPathMultiTextValue(XPathMultiValue):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
-        values = super(XPathMultiTextAttribute, self).get_value(**kwargs)
+        values = super(XPathMultiTextValue, self).get_value(**kwargs)
         return_values = []
         for value in values:
             if (hasattr(value, 'text') and
                     value.text is not None and
                     value.text.strip() != ''):
                 return_values.append(value.text.strip())
+            elif isinstance(value, basestring):
+                return_values.append(value)
         return return_values
 
 
-class CombinedAttribute(Attribute):
+class CombinedValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
         value = ''
@@ -104,7 +106,29 @@ class CombinedAttribute(Attribute):
         return value.strip(separator)
 
 
-class MultiAttribute(Attribute):
+class ZipValue(Value):
+    def get_value(self, **kwargs):
+        self.env.update(kwargs)
+        values = []
+        separator = self.env['separator'] if 'separator' in self.env else ' '
+
+        if 'zip_separator' in self.env:
+            zip_separator = self.env['zip_separator']
+        else:
+            zip_separator = ' '
+
+        for attribute in self._config:
+            values.append(attribute.get_value(**kwargs))
+
+        zip_values = zip(*values)
+        value = ''
+        for zip_value in zip_values:
+            value = value + separator + zip_separator.join(list(zip_value))
+
+        return value.strip(separator)
+
+
+class MultiValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
         value = ''
@@ -126,7 +150,7 @@ class MultiAttribute(Attribute):
         return value.strip(separator)
 
 
-class ArrayAttribute(Attribute):
+class ArrayValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
         value = []
@@ -146,7 +170,7 @@ class ArrayAttribute(Attribute):
         return value
 
 
-class ArrayTextAttribute(Attribute):
+class ArrayTextValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
         values = self._config.get_value(**kwargs)
@@ -154,16 +178,16 @@ class ArrayTextAttribute(Attribute):
         return separator.join(values)
 
 
-class ArrayDictNameAttribute(ArrayAttribute):
+class ArrayDictNameValue(ArrayValue):
     def get_value(self, **kwargs):
-        value = super(ArrayDictNameAttribute, self).get_value(**kwargs)
+        value = super(ArrayDictNameValue, self).get_value(**kwargs)
         return self.wrap_in_name_dict(value)
 
     def wrap_in_name_dict(self, values):
         return [{'name': munge_title_to_name(value)} for value in values]
 
 
-class FirstInOrderAttribute(CombinedAttribute):
+class FirstInOrderValue(CombinedValue):
     def get_value(self, **kwargs):
         for attribute in self._config:
             value = attribute.get_value(**kwargs)
@@ -187,6 +211,7 @@ class CkanMetadata(object):
             'license_url',
             'copyright',
             'version',
+            'version_notes',
             'notes',
             'tags',
             'abbreviation',
@@ -195,6 +220,7 @@ class CkanMetadata(object):
             'id_number',
             'description',
             'production_type',
+            'production_date',
             'abstract',
             'kind_of_data',
             'unit_of_analysis',
@@ -224,7 +250,6 @@ class CkanMetadata(object):
     def load(self, xml_string):
         dataset_xml = etree.fromstring(xml_string)
         ckan_metadata = {}
-        log.debug("heeere")
         for key in self.metadata:
             log.debug("Metadata key: %s" % key)
             attribute = self.get_attribute(key)
@@ -237,132 +262,156 @@ class CkanMetadata(object):
 class DdiCkanMetadata(CkanMetadata):
     """ Provides access to the DDI metadata """
     mapping = {
-        'id': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo'),  # noqa
-        'name': XPathTextAttribute(
+        'id': XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo'),  # noqa
+        'name': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"  # noqa
         ),
-        'title': XPathTextAttribute(
+        'title': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:titl"  # noqa
         ),
-        'abbreviation': XPathTextAttribute(
+        'abbreviation': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:altTitl"  # noqa
         ),
-        'study_type': XPathTextAttribute(
+        'study_type': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt/ddi:serName"  # noqa
         ),
-        'series_info': XPathTextAttribute(
+        'series_info': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:serStmt/ddi:serInfo"  # noqa
         ),
-        'id_number': XPathTextAttribute(
+        'id_number': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:titlStmt/ddi:IDNo"  # noqa
         ),
-        'description': XPathTextAttribute(
+        'description': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
-        'production_type': XPathTextAttribute(
+        'production_date': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr//ddi:citation/ddi:verStmt/ddi:version/@date"  # noqa
+        ),
+        'production_type': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
         ),
-        'abstract': XPathTextAttribute(
+        'abstract': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
-        'kind_of_data': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:dataKind"  # noqa
+        'kind_of_data': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:dataKind"  # noqa
         ),
-        'unit_of_analysis': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:anlyUnit"  # noqa
+        'unit_of_analysis': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:anlyUnit"  # noqa
         ),
-        'description_of_scope': XPathTextAttribute(
+        'description_of_scope': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
-        'country': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:nation"  # noqa
-        ),
-        'geographic_coverage': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:geogCover"  # noqa
-        ),
-        'time_period_covered': ArrayTextAttribute(
-            XPathMultiTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:timePrd"  # noqa
+        'country': ArrayTextValue(
+            XPathMultiTextValue(
+                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation"  # noqa
             ),
             separator=', '
         ),
-        'universe': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:universe"  # noqa
+        'geographic_coverage': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:geogCover"  # noqa
         ),
-        'primary_investigator': XPathTextAttribute(
+        'time_period_covered': ArrayTextValue(
+            XPathMultiTextValue(
+                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:timePrd"  # noqa
+            ),
+            separator=', '
+        ),
+        'universe': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:universe"  # noqa
+        ),
+        'primary_investigator': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty"  # noqa
         ),
-        'other_producers': FirstInOrderAttribute([
-            ArrayTextAttribute(
-                XPathMultiTextAttribute(
+        'other_producers': FirstInOrderValue([
+            ArrayTextValue(
+                XPathMultiTextValue(
                     "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId"  # noqa
                 ),
                 separator=', '
             ),
-            ArrayTextAttribute(
-                XPathMultiTextAttribute(
+            ArrayTextValue(
+                XPathMultiTextValue(
                     "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId/ddi:p"  # noqa
                 ),
                 separator=', '
             ),
         ]),
-        'funding': ArrayTextAttribute(
-            XPathMultiTextAttribute(
+        'funding': ArrayTextValue(
+            XPathMultiTextValue(
                 "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg"  # noqa
             ),
             separator=', '
         ),
-        'sampling_procedure': XPathTextAttribute(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:sampProc"  # noqa
+        'sampling_procedure': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc"  # noqa
         ),
-        'data_collection_dates': ArrayTextAttribute(
-            XPathMultiTextAttribute(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDescr/ddi:collDate",  # noqa
-            ),
+        'data_collection_dates': CombinedValue(
+            [
+                ZipValue(
+                    [
+                        XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='start']/@date",  # noqa
+                        ),
+                        XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@date",  # noqa
+                        ),
+                    ],
+                    zip_separator=' - ',
+                    separator=', '
+                ),
+                ArrayTextValue(
+                    XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='single' or not(@event)]/@date",  # noqa
+                    ),
+                    separator=', '
+                ),
+            ],
             separator=', '
         ),
-        'access_authority': XPathTextAttribute(
+        'access_authority': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:contact"  # noqa
         ),
-        'conditions': XPathTextAttribute(
+        'conditions': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:conditions"  # noqa
         ),
-        'citation_requirement': XPathTextAttribute(
+        'citation_requirement': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:citReq"  # noqa
         ),
-        'contact_persons': XPathTextAttribute(
+        'contact_persons': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
-        'url': XPathTextAttribute(
+        'url': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/@URI"  # noqa
         ),
-        'author': CombinedAttribute(
+        'author': CombinedValue(
             [
-                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
-                XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
+                XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
+                XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
             ],
             separator=', '
         ),
         # TODO: Do we need that? What DDI field should be used?
-        'author_email': StringAttribute(''),
-        'maintainer': XPathTextAttribute(
+        'author_email': StringValue(''),
+        'maintainer': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
-        'maintainer_email': XPathTextAttribute(
+        'maintainer_email': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
         ),
-        'copyright': XPathTextAttribute(
+        'copyright': XPathTextValue(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
-        'license_url': XPathTextAttribute(
+        'license_url': XPathTextValue(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
-        'version': XPathTextAttribute('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:version'),  # noqa
-        'notes': XPathTextAttribute(
+        'version': XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:version'),  # noqa
+        'version_notes': XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:notes'),  # noqa
+        'notes': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:notes"  # noqa
         ),
-        'tags': ArrayDictNameAttribute([
-            XPathMultiAttribute(
+        'tags': ArrayDictNameValue([
+            XPathMultiValue(
                 "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword"  # noqa
             )
         ]),
@@ -375,10 +424,10 @@ class DdiCkanMetadata(CkanMetadata):
         mapping = self.get_mapping()
         if ckan_attribute in mapping:
             return mapping[ckan_attribute]
-        raise AttributeMappingNotFoundError(
+        raise MappingNotFoundError(
             "No mapping found for attribute '%s'" % ckan_attribute
         )
 
 
-class AttributeMappingNotFoundError(Exception):
+class MappingNotFoundError(Exception):
     pass
