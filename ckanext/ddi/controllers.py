@@ -4,7 +4,6 @@ import logging
 import shutil
 import tempfile
 import os
-import uuid
 
 import ckan.logic as logic
 import ckan.lib.base as base
