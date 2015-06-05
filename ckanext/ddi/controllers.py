@@ -102,15 +102,17 @@ class ImportFromXml(PackageController):
     def run_import(self, data=None, errors=None, error_summary=None):
         pkg_id = None
         try:
-            importer = ddiimporter.DdiImporter()
+            user = c.user or c.author
+            importer = ddiimporter.DdiImporter(username=user)
 
             if request.params['upload'] != '':
-                log.debug('upload = %s' % request.params['upload'])
+                log.debug('upload: %s' % request.params['upload'])
                 file_path = self._save_temp_file(request.params['upload'].file)
+                log.debug('file_path: %s' % file_path)
                 pkg_id = importer.run(file_path=file_path)
                 os.remove(file_path)
             elif 'url' in request.params and request.params['url']:
-                log.debug('url = ' + request.params['url'])
+                log.debug('url: %s' % request.params['url'])
                 pkg_id = importer.run(url=request.params['url'])
 
             h.flash_success(
@@ -128,7 +130,7 @@ class ImportFromXml(PackageController):
 
     def _save_temp_file(self, fileobj):
         fd, file_path = tempfile.mkstemp()
-        fileobj.seek(0)
-        shutil.copyfileobj(fileobj, fd)
-        os.close(fd)
+        with os.fdopen(fd, 'w') as output_file:
+            fileobj.seek(0)
+            shutil.copyfileobj(fileobj, output_file)
         return file_path
