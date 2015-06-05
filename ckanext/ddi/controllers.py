@@ -1,6 +1,10 @@
 from ckan.controllers.package import PackageController
 
 import logging
+import shutil
+import tempfile
+import os
+import uuid
 
 import ckan.logic as logic
 import ckan.lib.base as base
@@ -101,14 +105,11 @@ class ImportFromXml(PackageController):
         try:
             importer = ddiimporter.DdiImporter()
 
-            # Check whether upload is a file or a url
-            # If it's a url, we pass in the url to the importer.run and call it
-            # If it's a file, check whether it's a valid XML
-            # If it is a proper XML, pass it into the importer.run and call it
-
-            if 'upload' in request.params and request.params['upload']:
-                log.debug('upload = ' + request.params['upload'])
-                pkg_id = importer.run(file_path=request.params['upload'])
+            if request.params['upload'] != '':
+                log.debug('upload = %s' % request.params['upload'])
+                file_path = self._save_temp_file(request.params['upload'].file)
+                pkg_id = importer.run(file_path=file_path)
+                os.remove(file_path)
             elif 'url' in request.params and request.params['url']:
                 log.debug('url = ' + request.params['url'])
                 pkg_id = importer.run(url=request.params['url'])
@@ -125,3 +126,10 @@ class ImportFromXml(PackageController):
             redirect(h.url_for(controller='package', action='read', id=pkg_id))
         else:
             redirect(h.url_for(controller='package', action='search'))
+
+    def _save_temp_file(self, fileobj):
+        fd, file_path = tempfile.mkstemp()
+        fileobj.seek(0)
+        shutil.copyfileobj(fileobj, fd)
+        os.close(fd)
+        return file_path
