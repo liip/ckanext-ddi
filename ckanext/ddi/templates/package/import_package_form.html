@@ -1,7 +1,7 @@
 {% import 'macros/form.html' as form %}
 {% set form_style = c.form_style or c.action %}
 
-<form class="dataset-form form-horizontal" method="post" enctype="multipart/form-data" action="import2" data-module="basic-form">
+<form class="dataset-form form-horizontal" method="post" enctype="multipart/form-data" action="importfile" data-module="basic-form">
   {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
 
   {% block basic_fields_url %}

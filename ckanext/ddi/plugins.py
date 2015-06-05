@@ -74,7 +74,7 @@ class DdiImport(plugins.SingletonPlugin):
             action='import_form'
         )
         map.connect(
-            '/dataset/import2',
+            '/dataset/importfile',
             controller='ckanext.ddi.controllers:ImportFromXml',
             action='run_import'
         )
