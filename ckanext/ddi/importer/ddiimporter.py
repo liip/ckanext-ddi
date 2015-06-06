@@ -14,6 +14,9 @@ log = logging.getLogger(__name__)
 
 
 class DdiImporter(HarvesterBase):
+    def __init__(self, username=None):
+        self.username = username
+
     def run(self, file_path=None, url=None, params=None):
         pkg_dict = None
         ckan_metadata = metadata.DdiCkanMetadata()
@@ -42,7 +45,7 @@ class DdiImporter(HarvesterBase):
 
     def insert_or_update_pkg(self, pkg_dict):
         try:
-            registry = ckanapi.LocalCKAN()
+            registry = ckanapi.LocalCKAN(username=self.username)
             pprint(pkg_dict)
             if pkg_dict['id'] and pkg_dict['id'] != '':
                 try:
