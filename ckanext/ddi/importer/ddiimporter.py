@@ -25,7 +25,13 @@ class DdiImporter(HarvesterBase):
                 pkg_dict = ckan_metadata.load(xml_file.read())
         elif url is not None:
             log.debug('Fetch file from %s' % url)
-            r = requests.get(url)
+            try:
+                r = requests.get(url)
+            except requests.exceptions.RequestException, e:
+                raise ContentFetchError(
+                    'Error while getting URL %s: %r'
+                    % (url, e)
+                )
             xml_file = r.text
 
             pkg_dict = ckan_metadata.load(xml_file)
@@ -41,7 +47,13 @@ class DdiImporter(HarvesterBase):
             pkg_dict['resources'] = resources
 
         pkg_dict = self.improve_pkg_dict(pkg_dict, params)
-        return self.insert_or_update_pkg(pkg_dict)
+        try:
+            return self.insert_or_update_pkg(pkg_dict)
+        except Exception, e:
+            raise ContentImportError(
+                'Could not import package %s: %s'
+                % (pkg_dict['name'], e)
+            )
 
     def insert_or_update_pkg(self, pkg_dict):
         try:
@@ -75,4 +87,13 @@ class DdiImporter(HarvesterBase):
             pkg_dict['license_id'] = params['license']
         else:
             pkg_dict['license_id'] = config.get('ckanext.ddi.default_license')
+
         return pkg_dict
+
+
+class ContentFetchError(Exception):
+    pass
+
+
+class ContentImportError(Exception):
+    pass
