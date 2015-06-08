@@ -1,1 +1,1 @@
-from ckanext.ddi.harvesters.ddiharvester import DdiHarvester
+from ckanext.ddi.harvesters.ddiharvester import NadaHarvester
