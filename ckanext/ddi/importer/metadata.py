@@ -248,7 +248,11 @@ class CkanMetadata(object):
         raise NotImplementedError
 
     def load(self, xml_string):
-        dataset_xml = etree.fromstring(xml_string)
+        try:
+            dataset_xml = etree.fromstring(xml_string)
+        except etree.XMLSyntaxError, e:
+            raise MetadataFormatError('Could not parse XML: %r' % e)
+
         ckan_metadata = {}
         for key in self.metadata:
             log.debug("Metadata key: %s" % key)
@@ -430,4 +434,8 @@ class DdiCkanMetadata(CkanMetadata):
 
 
 class MappingNotFoundError(Exception):
+    pass
+
+
+class MetadataFormatError(Exception):
     pass
