@@ -69,7 +69,7 @@ class NadaHarvester(HarvesterBase):
     def _get_ddi_api(self, ddi_id):
         return '/index.php/catalog/ddi/%s' % ddi_id
 
-    def _get_catalog_link(self, ddi_id):
+    def _get_catalog_path(self, ddi_id):
         return '/index.php/catalog/%s' % ddi_id
 
     def gather_stage(self, harvest_job):
@@ -158,7 +158,8 @@ class NadaHarvester(HarvesterBase):
             pkg_dict = ckan_metadata.load(harvest_object.content)
 
             # update URL with NADA catalog link
-            pkg_dict['url'] = base_url + self._get_catalog_link(harvest_object.guid)
+            catalog_path = self._get_catalog_path(harvest_object.guid)
+            pkg_dict['url'] = base_url + catalog_path
 
             # set license from harvester config or use CKAN instance default
             if 'license' in self.config:
