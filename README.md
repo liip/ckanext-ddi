@@ -3,15 +3,14 @@
 ckanext-ddi
 ===========
 
-**IMPORTANT: This extension is work in progress (WIP)**
-
 DDI extension for CKAN for the Worldbank.
 
-Planned Features:
+Features:
 
 * Import DDI data
 * Manage DDI data manually via the CKAN frontend
 * Upload DDI files (XML) to a CKAN instance
+* Harvest data from a [NADA](http://www.ihsn.org/home/projects/NADA-development) instance
 
 
 ## Installation
@@ -26,7 +25,10 @@ pip install -r requirements.txt
 python setup.py develop
 ```
 
-Make sure to add `ddi` and `ddi_harvester` to `ckan.plugins` in your config file.
+Make sure to add `ddi_schema`, `ddi_theme` and `nada_harvester` to `ckan.plugins` in your config file.
+If you don't want to use the frontend-part of this extension, you can omit the `ddi_theme`.
+
+To use the `nada_harvester`, make sure the [ckanext-harvest extension](https://github.com/ckan/ckanext-harvest) is installed as well.
 
 ## Usage
 Data can be imported either via command line or using the web interface.
@@ -44,6 +46,28 @@ paster --plugin=ckanext-ddi ddi import <path_or_url> [<license>] -c <path to con
 
 * `<path_or_url>` is a required parameter and - as the name implies - it can can either be a local file or a publicly accessible URL.
 * `<license>` is an optional parameter to specify the license of the dataset. Ideally this is a value from the [configured license group file](http://docs.ckan.org/en/943-writing-extensions-tutorial/configuration.html#licenses-group-url).
+
+### NADA harvester
+To add a NADA harvester, you should be logged in and visit `/harvest` on your CKAN installation (e.g. http://my.ckaninstance.org/harvest).
+There you can add a new harvest source with the type "NADA harvester for DDI".
+
+You can specify the configuration as JSON:
+
+* `user`: the CKAN user to perform the harvesting (default: `harvest`)
+* `access_type`: Parameter for NADA to specify the the data access type of the datasets, that should be harvester (default: `public_use`)
+
+Possible values for `access_type`:
+* `direct_access`
+* `public_use`
+* `licensed`
+* `data_enclave`
+* `data_external`
+* `no_data_available`
+
+JSON example:
+```bash
+{"user": "harvest", "access_type": "public_use"}
+```
 
 ## Configuration
 
