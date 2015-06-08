@@ -29,6 +29,22 @@ class NadaHarvester(HarvesterBase):
         'no_data_available': 6,
     }
 
+    DEFAULT_ATTRIBUTES = [
+        'id',
+        'name',
+        'title',
+        'url',
+        'author',
+        'author_email',
+        'maintainer',
+        'maintainer_email',
+        'license_id',
+        'version',
+        'notes',
+        'tags',
+        'extras',
+    ]
+
     def info(self):
         return {
             'name': 'nada',
@@ -156,6 +172,7 @@ class NadaHarvester(HarvesterBase):
             base_url = harvest_object.source.url.rstrip('/')
             ckan_metadata = DdiCkanMetadata()
             pkg_dict = ckan_metadata.load(harvest_object.content)
+            pkg_dict = self._convert_to_extras(pkg_dict)
 
             # update URL with NADA catalog link
             catalog_path = self._get_catalog_path(harvest_object.guid)
@@ -186,6 +203,22 @@ class NadaHarvester(HarvesterBase):
                 harvest_object
             )
             return False
+
+    def _convert_to_extras(self, pkg_dict):
+        if 'extras' not in pkg_dict:
+            pkg_dict['extras'] = []
+        keys_to_delete = []
+        for key in pkg_dict:
+            if key not in self.DEFAULT_ATTRIBUTES:
+                log.debug('Converting %s to extra' % key)
+                pkg_dict['extras'].append((key, pkg_dict[key]))
+                keys_to_delete.append(key)
+
+        for key in keys_to_delete:
+            if key in pkg_dict:
+                log.debug('Delete key %s from pkg_dict' % key)
+                del pkg_dict[key]
+        return pkg_dict
 
 
 class AccessTypeNotAvailableError(Exception):
