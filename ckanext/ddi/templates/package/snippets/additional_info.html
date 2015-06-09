@@ -22,6 +22,8 @@
                     {% else %}
                         <a href="{{ pkg[field] }}">{{ pkg[field] }}</a>
                     {% endif %}
+                  {% elif ddi_config['fields'][section][field]['type'] == 'markdown' %}
+                    {{ h.render_markdown(pkg[field], allow_html=True) }} 
                   {% else %}
                     {{ pkg[field] }}
                   {% endif %}

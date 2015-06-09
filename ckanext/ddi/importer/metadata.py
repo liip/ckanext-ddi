@@ -332,20 +332,20 @@ class DdiCkanMetadata(CkanMetadata):
                 XPathMultiTextValue(
                     "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId"  # noqa
                 ),
-                separator=', '
+                separator="<br />\r\n"
             ),
             ArrayTextValue(
                 XPathMultiTextValue(
                     "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId/ddi:p"  # noqa
                 ),
-                separator=', '
+                separator="<br />\r\n"
             ),
         ]),
         'funding': ArrayTextValue(
             XPathMultiTextValue(
                 "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg"  # noqa
             ),
-            separator=', '
+            separator="<br />\r\n"
         ),
         'sampling_procedure': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc"  # noqa
@@ -360,18 +360,20 @@ class DdiCkanMetadata(CkanMetadata):
                         XPathMultiTextValue(
                             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@date",  # noqa
                         ),
+                        XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@cycle",  # noqa
+                        ),
                     ],
-                    zip_separator=' - ',
-                    separator=', '
+                    separator="<br />\r\n"
                 ),
                 ArrayTextValue(
                     XPathMultiTextValue(
                             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='single' or not(@event)]/@date",  # noqa
                     ),
-                    separator=', '
+                    separator="<br />\r\n"
                 ),
             ],
-            separator=', '
+            separator="<br />\r\n"
         ),
         'access_authority': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:contact"  # noqa
@@ -393,7 +395,7 @@ class DdiCkanMetadata(CkanMetadata):
                 XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
                 XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
             ],
-            separator=', '
+            separator="<br />\r\n"
         ),
         # TODO: Do we need that? What DDI field should be used?
         'author_email': StringValue(''),
