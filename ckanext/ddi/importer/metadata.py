@@ -106,24 +106,23 @@ class CombinedValue(Value):
         return value.strip(separator)
 
 
-class ZipValue(Value):
+class DateCollectionValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
-        values = []
         separator = self.env['separator'] if 'separator' in self.env else ' '
 
-        if 'zip_separator' in self.env:
-            zip_separator = self.env['zip_separator']
-        else:
-            zip_separator = ' '
+        start_dates = self._config[0].get_value(**kwargs)
+        end_dates = self._config[1].get_value(**kwargs)
+        cycles = self._config[2].get_value(**kwargs)
 
-        for attribute in self._config:
-            values.append(attribute.get_value(**kwargs))
-
-        zip_values = zip(*values)
         value = ''
-        for zip_value in zip_values:
-            value = value + separator + zip_separator.join(list(zip_value))
+        for i, date in enumerate(start_dates):
+            value += date + ' - '
+            if i <= len(end_dates) - 1:
+                value += end_dates[i]
+            if i <= len(cycles) - 1:
+                value += ': ' + cycles[i]
+            value += separator
 
         return value.strip(separator)
 
@@ -332,27 +331,27 @@ class DdiCkanMetadata(CkanMetadata):
                 XPathMultiTextValue(
                     "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId"  # noqa
                 ),
-                separator=', '
+                separator="<br />\r\n"
             ),
             ArrayTextValue(
                 XPathMultiTextValue(
                     "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:othId/ddi:p"  # noqa
                 ),
-                separator=', '
+                separator="<br />\r\n"
             ),
         ]),
         'funding': ArrayTextValue(
             XPathMultiTextValue(
                 "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:fundAg"  # noqa
             ),
-            separator=', '
+            separator="<br />\r\n"
         ),
         'sampling_procedure': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:dataColl/ddi:sampProc"  # noqa
         ),
         'data_collection_dates': CombinedValue(
             [
-                ZipValue(
+                DateCollectionValue(
                     [
                         XPathMultiTextValue(
                             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='start']/@date",  # noqa
@@ -360,18 +359,20 @@ class DdiCkanMetadata(CkanMetadata):
                         XPathMultiTextValue(
                             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@date",  # noqa
                         ),
+                        XPathMultiTextValue(
+                            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@cycle",  # noqa
+                        ),
                     ],
-                    zip_separator=' - ',
-                    separator=', '
+                    separator="<br />\r\n"
                 ),
                 ArrayTextValue(
                     XPathMultiTextValue(
                             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='single' or not(@event)]/@date",  # noqa
                     ),
-                    separator=', '
+                    separator="<br />\r\n"
                 ),
             ],
-            separator=', '
+            separator="<br />\r\n"
         ),
         'access_authority': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:contact"  # noqa
@@ -393,7 +394,7 @@ class DdiCkanMetadata(CkanMetadata):
                 XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:rspStmt/ddi:AuthEnty'),  # noqa
                 XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:contributor'),  # noqa
             ],
-            separator=', '
+            separator="<br />\r\n"
         ),
         # TODO: Do we need that? What DDI field should be used?
         'author_email': StringValue(''),
