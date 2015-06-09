@@ -164,7 +164,10 @@ class NadaHarvester(HarvesterBase):
         try:
             ddi_api_url = base_url + self._get_ddi_api(harvest_object.guid)
             log.debug('Fetching content from %s' % ddi_api_url)
-            r = requests.get(ddi_api_url)
+            headers = {
+                'User-agent': 'Mozilla/5.0'
+            }
+            r = requests.get(ddi_api_url, headers=headers)
             harvest_object.content = r.text
             harvest_object.save()
             log.debug('successfully processed ' + harvest_object.guid)
