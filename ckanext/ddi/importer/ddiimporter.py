@@ -56,24 +56,24 @@ class DdiImporter(HarvesterBase):
             )
 
     def insert_or_update_pkg(self, pkg_dict):
-        try:
-            registry = ckanapi.LocalCKAN(username=self.username)
-            pprint(pkg_dict)
-            if pkg_dict['id'] and pkg_dict['id'] != '':
-                try:
-                    registry.call_action('package_update', pkg_dict)
-                except ckanapi.NotFound:
-                    del pkg_dict['id']
-                    pkg_dict['name'] = self._gen_new_name(pkg_dict['name'])
-                    registry.call_action('package_create', pkg_dict)
-            else:
+        registry = ckanapi.LocalCKAN(username=self.username)
+        if pkg_dict['id'] and pkg_dict['id'] != '':
+            try:
+                existing_pkg = registry.call_action('package_show', pkg_dict)
+                del pkg_dict['name']
+                existing_pkg.update(pkg_dict)
+                pkg_dict = existing_pkg
+                registry.call_action('package_update', pkg_dict)
+            except ckanapi.NotFound:
                 del pkg_dict['id']
+                pkg_dict['name'] = self._gen_new_name(pkg_dict['name'])
                 registry.call_action('package_create', pkg_dict)
+        else:
+            del pkg_dict['id']
+            registry.call_action('package_create', pkg_dict)
 
-            pprint(pkg_dict)
-            return pkg_dict['name']
-        except:
-            traceback.print_exc()
+        pprint(pkg_dict)
+        return pkg_dict['name']
 
     def improve_pkg_dict(self, pkg_dict, params):
         if pkg_dict['name'] != '':
