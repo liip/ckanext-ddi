@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
+import traceback
 
 from ckan.lib.helpers import json
 from ckan.lib.munge import munge_tag
@@ -142,8 +143,8 @@ class NadaHarvester(HarvesterBase):
             return harvest_obj_ids
         except Exception, e:
             self._save_gather_error(
-                'Unable to get content for URL: %s: %s'
-                % (api_url, str(e)),
+                'Unable to get content for URL: %s: %s / %s'
+                % (api_url, str(e), traceback.format_exc()),
                 harvest_job
             )
 
@@ -168,13 +169,17 @@ class NadaHarvester(HarvesterBase):
                 'User-agent': 'Mozilla/5.0'
             }
             r = requests.get(ddi_api_url, headers=headers)
+            r.encoding = 'utf-8'
             harvest_object.content = r.text
             harvest_object.save()
             log.debug('successfully processed ' + harvest_object.guid)
             return True
         except Exception, e:
             self._save_object_error(
-                'Unable to get content for package: %s: %r' % (ddi_api_url, e),
+                (
+                    'Unable to get content for package: %s: %r / %s'
+                    % (ddi_api_url, e, traceback.format_exc())
+                ),
                 harvest_object
             )
             return False
@@ -211,7 +216,7 @@ class NadaHarvester(HarvesterBase):
                 )
             tags = []
             for tag in pkg_dict['tags']:
-                if tag is not None:
+                if isinstance(tag, basestring):
                     tags.append(munge_tag(tag[:100]))
             pkg_dict['tags'] = tags
             pkg_dict['version'] = pkg_dict['version'][:100]
@@ -228,7 +233,10 @@ class NadaHarvester(HarvesterBase):
             return self._create_or_update_package(pkg_dict, harvest_object)
         except Exception, e:
             self._save_object_error(
-                'Exception in import stage: %r' % (e),
+                (
+                    'Exception in import stage: %r / %s'
+                    % (e, traceback.format_exc())
+                ),
                 harvest_object
             )
             return False
