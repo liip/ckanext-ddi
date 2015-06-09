@@ -3,6 +3,7 @@
 import requests
 
 from ckan.lib.helpers import json
+from ckan.lib.munge import munge_tag
 from ckanext.harvest.model import HarvestObject
 from ckanext.harvest.harvesters import HarvesterBase
 from ckanext.ddi.importer import DdiCkanMetadata
@@ -204,6 +205,12 @@ class NadaHarvester(HarvesterBase):
                     'ckanext.ddi.default_license',
                     ''
                 )
+            tags = []
+            for tag in pkg_dict['tags']:
+                if tag is not None:
+                    tags.append(munge_tag(tag[:100]))
+            pkg_dict['tags'] = tags
+            pkg_dict['version'] = pkg_dict['version'][:100]
 
             # add resources
             resources = [{
