@@ -91,11 +91,11 @@ fields:
             visible: True
             display: Primary Investigator
         other_producers:
-            type: text
+            type: markdown
             visible: True
             display: Other Producers
         funding:
-            type: text
+            type: markdown
             visible: True
             display: Funding
     sampling:
@@ -105,7 +105,7 @@ fields:
             display: Sampling Procedure
     data_collection:
         data_collection_dates:
-            type: text
+            type: markdown
             visible: True
             display: Dates of Data Collection
     data_appraisal:
