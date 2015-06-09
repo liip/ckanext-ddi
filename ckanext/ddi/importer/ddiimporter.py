@@ -1,4 +1,5 @@
 import requests
+import codecs
 from pprint import pprint
 
 from ckan.lib.munge import munge_title_to_name
@@ -20,7 +21,7 @@ class DdiImporter(HarvesterBase):
         pkg_dict = None
         ckan_metadata = metadata.DdiCkanMetadata()
         if file_path is not None:
-            with open(file_path) as xml_file:
+            with codecs.open(file_path, 'r', encoding='utf-8') as xml_file:
                 pkg_dict = ckan_metadata.load(xml_file.read())
         elif url is not None:
             log.debug('Fetch file from %s' % url)
@@ -31,6 +32,7 @@ class DdiImporter(HarvesterBase):
                     'Error while getting URL %s: %r'
                     % (url, e)
                 )
+            r.encoding = 'utf-8'
             xml_file = r.text
 
             pkg_dict = ckan_metadata.load(xml_file)
