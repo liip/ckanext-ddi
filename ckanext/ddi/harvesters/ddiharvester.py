@@ -22,6 +22,7 @@ class NadaHarvester(HarvesterBase):
     HARVEST_USER = 'harvest'
 
     ACCESS_TYPES = {
+        '': '',
         'direct_access': 1,
         'public_use': 2,
         'licensed': 3,
