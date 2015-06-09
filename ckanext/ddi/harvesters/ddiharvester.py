@@ -67,20 +67,23 @@ class NadaHarvester(HarvesterBase):
 
         log.debug('Using config: %r' % self.config)
 
-    def _get_search_api(self, access_type=None):
+    def _get_search_api(self, access_type=None, page=1):
         if access_type is not None:
             try:
                 return (
-                    '/index.php/api/v2/catalog/search/format/json/?dtype[]=%s'
-                    % self.ACCESS_TYPES[access_type]
-                )
+                    '/index.php/api/v2/catalog/search/format/json/'
+                    '?dtype[]=%s&page=%s'
+                ) % (self.ACCESS_TYPES[access_type], page)
             except KeyError:
                 raise AccessTypeNotAvailableError(
                     'Access type %s not available. Available types: %s'
                     % (access_type, self.ACCESS_TYPES)
                 )
         else:
-            return '/index.php/api/v2/catalog/search/format/json'
+            return (
+                '/index.php/api/v2/catalog/search/format/json?page=%s'
+                % page
+            )
 
     def _get_ddi_api(self, ddi_id):
         return '/index.php/catalog/ddi/%s' % ddi_id
@@ -91,31 +94,46 @@ class NadaHarvester(HarvesterBase):
     def gather_stage(self, harvest_job):
         log.debug('In NadaHarvester gather_stage')
         api_url = None
+
         try:
-            self._set_config(harvest_job.source.config)
-            base_url = harvest_job.source.url.rstrip('/')
-
-            try:
-                api_url = base_url + self._get_search_api(
-                    self.config['access_type']
-                )
-            except (AccessTypeNotAvailableError, KeyError):
-                api_url = base_url + self._get_search_api('public_use')
-
-            log.debug('Gather datasets from: %s' % api_url)
-
-            r = requests.get(api_url)
-            data = r.json()
-            log.debug('JSON data from %s: %r' % (api_url, data))
-
+            continue_gather = True
+            page = 1
             harvest_obj_ids = []
-            for row in data['rows']:
-                harvest_obj = HarvestObject(
-                    guid=row['id'],
-                    job=harvest_job
-                )
-                harvest_obj.save()
-                harvest_obj_ids.append(harvest_obj.id)
+            while continue_gather:
+                self._set_config(harvest_job.source.config)
+                base_url = harvest_job.source.url.rstrip('/')
+
+                try:
+                    api_url = base_url + self._get_search_api(
+                        self.config['access_type'],
+                        page
+                    )
+                except (AccessTypeNotAvailableError, KeyError):
+                    api_url = base_url + self._get_search_api(
+                        'public_use',
+                        page
+                    )
+
+                log.debug('Gather datasets from: %s' % api_url)
+
+                headers = {
+                    'User-agent': 'Mozilla/5.0'
+                }
+                r = requests.get(api_url, headers=headers)
+                data = r.json()
+
+                log.debug('JSON data from %s: %r' % (api_url, data))
+
+                for row in data['rows']:
+                    harvest_obj = HarvestObject(
+                        guid=row['id'],
+                        job=harvest_job
+                    )
+                    harvest_obj.save()
+                    harvest_obj_ids.append(harvest_obj.id)
+                page += 1
+                row_count = int(data['offset']) + int(data['limit'])
+                continue_gather = row_count < int(data['found'])
 
             log.debug('IDs: %r' % harvest_obj_ids)
 
