@@ -106,24 +106,25 @@ class CombinedValue(Value):
         return value.strip(separator)
 
 
-class ZipValue(Value):
+class DateCollectionValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
         values = []
         separator = self.env['separator'] if 'separator' in self.env else ' '
 
-        if 'zip_separator' in self.env:
-            zip_separator = self.env['zip_separator']
-        else:
-            zip_separator = ' '
 
-        for attribute in self._config:
-            values.append(attribute.get_value(**kwargs))
+        start_dates = self._config[0].get_value(**kwargs)
+        end_dates = self._config[1].get_value(**kwargs)
+        cycles = self._config[2].get_value(**kwargs)
 
-        zip_values = zip(*values)
         value = ''
-        for zip_value in zip_values:
-            value = value + separator + zip_separator.join(list(zip_value))
+        for i, date in enumerate(start_dates):
+            value += date + ' - '
+            if i <= len(end_dates) - 1:
+                value += end_dates[i]
+            if i <= len(cycles) - 1:
+                value += ': ' + cycles[i]
+            value += separator
 
         return value.strip(separator)
 
@@ -352,7 +353,7 @@ class DdiCkanMetadata(CkanMetadata):
         ),
         'data_collection_dates': CombinedValue(
             [
-                ZipValue(
+                DateCollectionValue(
                     [
                         XPathMultiTextValue(
                             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='start']/@date",  # noqa
