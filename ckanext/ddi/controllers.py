@@ -115,12 +115,18 @@ class ImportFromXml(PackageController):
                 log.debug('url: %s' % request.params['url'])
                 pkg_id = importer.run(url=request.params['url'])
 
+            if pkg_id is None:
+                raise PackageImportError(
+                    'Could not import package (%s / %s / %s)'
+                    % (request.params.get('upload'), file_path, request.params.get('url'))
+                )
+
             h.flash_success(
-                _("Dataset import from XML successfully completed!")
+                _('Dataset import from XML successfully completed!')
             )
         except Exception as e:
             h.flash_error(
-                _("Dataset import from XML failed: %s" % str(e))
+                _('Dataset import from XML failed: %s' % str(e))
             )
         finally:
             if file_path is not None:
@@ -137,3 +143,6 @@ class ImportFromXml(PackageController):
             fileobj.seek(0)
             shutil.copyfileobj(fileobj, output_file)
         return file_path
+
+class PackageImportError(Exception):
+    pass
