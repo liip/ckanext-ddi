@@ -25,11 +25,10 @@ setup(
     entry_points=\
     """
     [ckan.plugins]
-    ddi=ckanext.ddi.plugins:DdiHarvest
-    ddi_harvester=ckanext.ddi.harvesters:DdiHarvester
     ddi_theme=ckanext.ddi.plugins:DdiTheme
     ddi_schema=ckanext.ddi.plugins:DdiSchema
     ddi_import=ckanext.ddi.plugins:DdiImport
+    nada_harvester=ckanext.ddi.harvesters:NadaHarvester
     [paste.paster_command]
     harvester=ckanext.ddi.commands.harvester:Harvester
     ddi=ckanext.ddi.commands.ddi:DdiCommand

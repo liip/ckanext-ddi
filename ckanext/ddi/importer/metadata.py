@@ -208,7 +208,7 @@ class CkanMetadata(object):
             'author_email',
             'maintainer',
             'maintainer_email',
-            'license_url',
+            'license_id',
             'copyright',
             'version',
             'version_notes',
@@ -248,7 +248,11 @@ class CkanMetadata(object):
         raise NotImplementedError
 
     def load(self, xml_string):
-        dataset_xml = etree.fromstring(xml_string)
+        try:
+            dataset_xml = etree.fromstring(xml_string)
+        except etree.XMLSyntaxError, e:
+            raise MetadataFormatError('Could not parse XML: %r' % e)
+
         ckan_metadata = {}
         for key in self.metadata:
             log.debug("Metadata key: %s" % key)
@@ -402,7 +406,7 @@ class DdiCkanMetadata(CkanMetadata):
         'copyright': XPathTextValue(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
-        'license_url': XPathTextValue(
+        'license_id': XPathTextValue(
             '//ddi:codeBook/ddi:stdyInfo/ddi:citation/ddi:prodStmt/ddi:copyright'  # noqa
         ),
         'version': XPathTextValue('//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:verStmt/ddi:version'),  # noqa
@@ -430,4 +434,8 @@ class DdiCkanMetadata(CkanMetadata):
 
 
 class MappingNotFoundError(Exception):
+    pass
+
+
+class MetadataFormatError(Exception):
     pass

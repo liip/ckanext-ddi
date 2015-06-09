@@ -11,13 +11,6 @@ from pylons import config
 log = logging.getLogger(__name__)
 
 
-class DdiHarvest(plugins.SingletonPlugin):
-    """
-    Plugin containing the harvester for ddi for
-    the World Bank
-    """
-
-
 def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass
