@@ -54,6 +54,7 @@ There you can add a new harvest source with the type "NADA harvester for DDI".
 You can specify the configuration as JSON:
 
 * `user`: the CKAN user to perform the harvesting (default: `harvest`)
+* `license`: A default license to apply to all harvested datasets (default: empty). If this is not specified the config value `ckanext.ddi.default_license` is used (see below).
 * `access_type`: Parameter for NADA to specify the the data access type of the datasets, that should be harvester (default: `public_use`)
 
 Possible values for `access_type`:
@@ -66,7 +67,7 @@ Possible values for `access_type`:
 
 JSON example:
 ```bash
-{"user": "harvest", "access_type": "public_use"}
+{"user": "harvest", "access_type": "public_use", "license": "CC-BY-SA-4.0"}
 ```
 
 ## Configuration
