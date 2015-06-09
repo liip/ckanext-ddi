@@ -109,9 +109,7 @@ class CombinedValue(Value):
 class DateCollectionValue(Value):
     def get_value(self, **kwargs):
         self.env.update(kwargs)
-        values = []
         separator = self.env['separator'] if 'separator' in self.env else ' '
-
 
         start_dates = self._config[0].get_value(**kwargs)
         end_dates = self._config[1].get_value(**kwargs)

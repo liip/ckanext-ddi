@@ -1,5 +1,4 @@
 import requests
-import traceback
 from pprint import pprint
 
 from ckan.lib.munge import munge_title_to_name

@@ -118,7 +118,11 @@ class ImportFromXml(PackageController):
             if pkg_id is None:
                 raise PackageImportError(
                     'Could not import package (%s / %s / %s)'
-                    % (request.params.get('upload'), file_path, request.params.get('url'))
+                    % (
+                        request.params.get('upload'),
+                        file_path,
+                        request.params.get('url')
+                    )
                 )
 
             h.flash_success(
@@ -143,6 +147,7 @@ class ImportFromXml(PackageController):
             fileobj.seek(0)
             shutil.copyfileobj(fileobj, output_file)
         return file_path
+
 
 class PackageImportError(Exception):
     pass
