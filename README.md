@@ -51,6 +51,10 @@ paster --plugin=ckanext-ddi ddi import <path_or_url> [<license>] -c <path to con
 To add a NADA harvester, you should be logged in and visit `/harvest` on your CKAN installation (e.g. http://my.ckaninstance.org/harvest).
 There you can add a new harvest source with the type "NADA harvester for DDI".
 
+In the URL field, specify the base URL of your NADA instance. If the start page of your NADA instance is my.nada-instance.org/index.php/home, then please specify http://my.nada-instance.org as the URL for the harvester.
+
+![Example configuration for NADA harvester](https://raw.github.com/liip/ckanext-ddi/master/examples/nada_harvester_config.png)
+
 You can specify the configuration as JSON:
 
 * `user`: the CKAN user to perform the harvesting (default: `harvest`)
