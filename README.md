@@ -68,6 +68,7 @@ Possible values for `access_type`:
 * `data_enclave`
 * `data_external`
 * `no_data_available`
+* `open_data`
 
 JSON example:
 ```bash
