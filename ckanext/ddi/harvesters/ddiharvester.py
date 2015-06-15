@@ -30,6 +30,7 @@ class NadaHarvester(HarvesterBase):
         'data_enclave': 4,
         'data_external': 5,
         'no_data_available': 6,
+        'open_data': 7,
     }
 
     DEFAULT_ATTRIBUTES = [
