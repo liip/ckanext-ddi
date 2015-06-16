@@ -34,7 +34,13 @@ To use the `nada_harvester`, make sure the [ckanext-harvest extension](https://g
 Data can be imported either via command line or using the web interface.
 
 ### Web interface
-If you are logged in and you have the appropriate permissions, you find a new button "Import Dataset from XML" on the dataset page.
+If you are logged in and you have the appropriate permissions, you find a new button "Import Dataset from DDI/XML" on the dataset page.
+
+![Import Dataset from DDI/XML button](https://raw.github.com/liip/ckanext-ddi/master/examples/add_dataset_button.png)
+
+This buttons leads you to an import page, where a DDI XML can either be uploaded or specified as URL.
+
+![Import Dataset page](https://raw.github.com/liip/ckanext-ddi/master/examples/import_dataset.png)
 
 ### Run import from command line
 This plugin provides the possibility to import DDI XML files using a paster command.
