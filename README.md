@@ -50,7 +50,45 @@ There are 3 sections:
 
 1. `sections`: describes different section, used to group together `fields`
 2. `vocabularies`: describes availables controlled vocabularies, that can be referenced
-3. `fields`: describes all fields, their type and how they are displayed 
+3. `fields`: describes all fields, their type and how they are displayed. Only the predefined fields can be used:
+    * `id`
+    * `name`
+    * `title`
+    * `url`
+    * `author`
+    * `author_email`
+    * `maintainer`
+    * `maintainer_email`
+    * `license_id`
+    * `copyright`
+    * `version`
+    * `version_notes`
+    * `notes`
+    * `tags`
+    * `abbreviation`
+    * `study_type`
+    * `series_info`
+    * `id_number`
+    * `description`
+    * `production_type`
+    * `production_date`
+    * `abstract`
+    * `kind_of_data`
+    * `unit_of_analysis`
+    * `description_of_scope`
+    * `country`
+    * `geographic_coverage`
+    * `time_period_covered`
+    * `universe`
+    * `primary_investigator`
+    * `other_producers`
+    * `funding`
+    * `sampling_procedure`
+    * `data_collection_dates`
+    * `access_authority`
+    * `conditions`
+    * `citation_requirement`
+    * `contact_persons`
 
 Example:
 
@@ -95,7 +133,6 @@ sections:
 Based on this configuration the web UI is generated:
 
 ![Dataset page](https://raw.github.com/liip/ckanext-ddi/master/screenshots/dataset_view.png)
-
 
 ## Usage
 Data can be imported either via command line or using the web interface.
