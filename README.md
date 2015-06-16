@@ -36,11 +36,11 @@ Data can be imported either via command line or using the web interface.
 ### Web interface
 If you are logged in and you have the appropriate permissions, you find a new button "Import Dataset from DDI/XML" on the dataset page.
 
-![Import Dataset from DDI/XML button](https://raw.github.com/liip/ckanext-ddi/master/examples/add_dataset_button.png)
+![Import Dataset from DDI/XML button](https://raw.github.com/liip/ckanext-ddi/master/screenshots/add_dataset_button.png)
 
 This buttons leads you to an import page, where a DDI XML can either be uploaded or specified as URL.
 
-![Import Dataset page](https://raw.github.com/liip/ckanext-ddi/master/examples/import_dataset.png)
+![Import Dataset page](https://raw.github.com/liip/ckanext-ddi/master/screenshots/import_dataset.png)
 
 ### Run import from command line
 This plugin provides the possibility to import DDI XML files using a paster command.
@@ -59,7 +59,7 @@ There you can add a new harvest source with the type "NADA harvester for DDI".
 
 In the URL field, specify the base URL of your NADA instance. If the start page of your NADA instance is my.nada-instance.org/index.php/home, then please specify http://my.nada-instance.org as the URL for the harvester.
 
-![Example configuration for NADA harvester](https://raw.github.com/liip/ckanext-ddi/master/examples/nada_harvester_config.png)
+![Example configuration for NADA harvester](https://raw.github.com/liip/ckanext-ddi/master/screenshots/nada_harvester_config.png)
 
 You can specify the configuration as JSON:
 
