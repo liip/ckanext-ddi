@@ -178,13 +178,14 @@ You can specify the configuration as JSON:
 * `access_type`: Parameter for NADA to specify the the data access type of the datasets, that should be harvester (default: `public_use`)
 
 Possible values for `access_type`:
-* `direct_access`
-* `public_use`
-* `licensed`
-* `data_enclave`
-* `data_external`
-* `no_data_available`
-* `open_data`
+* `""` (empty string, i.e. all data access types are allowed)
+* `"direct_access"`
+* `"public_use"` (default)
+* `"licensed"`
+* `"data_enclave"`
+* `"data_external"`
+* `"no_data_available"`
+* `"open_data"`
 
 JSON example:
 ```bash
