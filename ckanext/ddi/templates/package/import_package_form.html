@@ -1,5 +1,6 @@
 {% import 'macros/form.html' as form %}
 {% set form_style = c.form_style or c.action %}
+{% resource 'ddi/ddi-import.js' %}
 
 <form class="dataset-form form-horizontal" method="post" enctype="multipart/form-data" action="importfile" data-module="basic-form">
   {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
@@ -17,12 +18,11 @@
         <p class="action-info small">
           {%- trans -%}
           Important: By submitting content, you
-          agree to release your contributions under the Open Database
-          License.
+          agree to release your contributions under an open license.
           {%- endtrans -%}
         </p>
       {% endblock %}
-      <button class="btn btn-primary" type="submit" name="import">{% block import_button_text %}{{ _('Import') }}{% endblock %}</button>
+      <button class="btn btn-primary" disabled="disabled" id="import-btn" type="submit" name="import">{% block import_button_text %}{{ _('Import') }}{% endblock %}</button>
       {{ form.required_message() }}
     </div>
   {% endblock %}

@@ -78,6 +78,7 @@ class DdiImport(plugins.SingletonPlugin):
 
     def update_config(self, config):
         tk.add_template_directory(config, 'templates')
+        tk.add_resource('fanstatic', 'ddi')
 
 
 class DdiSchema(plugins.SingletonPlugin, tk.DefaultDatasetForm):
