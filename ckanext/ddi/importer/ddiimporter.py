@@ -36,13 +36,27 @@ class DdiImporter(HarvesterBase):
             xml_file = r.text
 
             pkg_dict = ckan_metadata.load(xml_file)
+            resources = []
+
+            # if we can assume the URL is from a NADA catalogue
+            # set some properties automagically
+            if '/index.php/catalog/ddi/' in url:
+                nada_catalog_url = url.replace('/ddi/', '/', 1)
+                if pkg_dict['url'] == '':
+                    pkg_dict['url'] = nada_catalog_url
+
+                resources.append({
+                    'url': nada_catalog_url,
+                    'name': 'NADA catalog entry',
+                    'format': 'html'
+                })
+
             if pkg_dict['url'] == '':
                 pkg_dict['url'] = url
 
-            resources = []
             resources.append({
                 'url': url,
-                'name': pkg_dict['title'],
+                'name': 'DDI XML of %s' % pkg_dict['title'],
                 'format': 'xml'
             })
             pkg_dict['resources'] = resources
