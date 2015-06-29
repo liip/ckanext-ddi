@@ -223,11 +223,18 @@ class NadaHarvester(HarvesterBase):
             pkg_dict['version'] = pkg_dict['version'][:100]
 
             # add resources
-            resources = [{
-                'url': base_url + self._get_ddi_api(harvest_object.guid),
-                'name': 'DDI XML of %s' % pkg_dict['title'],
-                'format': 'xml'
-            }]
+            resources = [
+                {
+                    'url': base_url + self._get_ddi_api(harvest_object.guid),
+                    'name': 'DDI XML of %s' % pkg_dict['title'],
+                    'format': 'xml'
+                },
+                {
+                    'url': pkg_dict['url'],
+                    'name': 'NADA catalog entry',
+                    'format': 'html'
+                },
+            ]
             pkg_dict['resources'] = resources
 
             log.debug('package dict: %s' % pkg_dict)
