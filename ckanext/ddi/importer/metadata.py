@@ -240,6 +240,7 @@ class CkanMetadata(object):
             'conditions',
             'citation_requirement',
             'contact_persons'
+            'contact_persons_email'
         ])
 
     def get_attribute(self, ckan_attribute):
