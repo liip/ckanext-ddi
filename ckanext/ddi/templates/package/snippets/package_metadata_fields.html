@@ -11,8 +11,6 @@
     {% if field != 'title' %}
       {% if ddi_config['fields'][section][field]['type'] == 'markdown' %}
         {{ form.markdown(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
-      {% elif ddi_config['fields'][section][field]['type'] == 'text' %}
-        {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
       {% elif ddi_config['fields'][section][field]['type'] == 'vocabulary' %}
         {% set options = ['    '] + ddi_config['vocabularies'][field] %}
 
@@ -28,7 +26,8 @@
             {% if error %}<span class="error-block">{{ error }}</span>{% endif %}
           </div>
             </div>
-
+      {% else %}
+        {{ form.input(field, id='field-'+field, label=_(ddi_config['fields'][section][field]['display']), placeholder=_(ddi_config['fields'][section][field]['display']), value=data[field], error=errors.field, classes=['control-full']) }}
       {% endif %}
     {% endif %}
   {% endfor %}
