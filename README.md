@@ -91,6 +91,7 @@ There are 3 sections:
     * `conditions`
     * `citation_requirement`
     * `contact_persons`
+    * `contact_persons_email`
 
 Example:
 
@@ -116,7 +117,7 @@ fields:
             visible: True
             display: Kind of Data
     contact:
-        maintainer_email:
+        contact_persons_email:
             type: email
             display_field: contact_persons
             visible: True
@@ -136,6 +137,7 @@ vocabularies:
 sections:
     identification: Identification
     overview: Overview
+    contact: Contact information
 ```
 
 Based on this configuration the web UI is generated:

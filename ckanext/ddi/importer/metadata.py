@@ -389,6 +389,9 @@ class DdiCkanMetadata(CkanMetadata):
         'contact_persons': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
+        'contact_persons_email': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
+        ),
         'url': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/@URI"  # noqa
         ),
