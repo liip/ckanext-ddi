@@ -119,7 +119,7 @@ fields:
             display: Citation Requirement
     contacts:
         contact_persons_email:
-            type: url
+            type: email
             visible: True
             display: Contact Persons
             internal_display: Contact Persons Email
