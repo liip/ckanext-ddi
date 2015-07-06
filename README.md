@@ -15,6 +15,8 @@ Features:
 
 ## Installation
 
+**Requirement: This extensions runs on CKAN 2.3 or higher.**
+
 Use `pip` to install this plugin. This example installs it in `/home/www-data`
 
 ```bash
