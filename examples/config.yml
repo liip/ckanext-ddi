@@ -122,6 +122,7 @@ fields:
             type: url
             visible: True
             display: Contact Persons
+            internal_display: Contact Persons Email
             display_field: contact_persons
 
 vocabularies:
