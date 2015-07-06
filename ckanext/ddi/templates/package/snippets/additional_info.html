@@ -12,15 +12,23 @@
               </td>
               <td>
                 <p class="metadata">
-                  {% if ddi_config['fields'][section][field]['type'] == 'url' %}
+                  {% set field_type = ddi_config['fields'][section][field]['type'] %}
+                  {% if field_type == 'url' or field_type == 'email' %}
                     {% set display_field = ddi_config['fields'][section][field]['display_field'] %}
                     {% set display_text = ddi_config['fields'][section][field]['display_text'] %}
-                    {% if display_field and display_field in pkg %}
-                        <a href="{{ pkg[field] }}">{{ pkg[display_field] }}</a>
-                    {% elif display_text %}
-                        <a href="{{ pkg[field] }}">{{ display_text }}</a>
+
+                    {% if field_type == 'email' %}
+                      {% set link = 'mailto:' + pkg[field] %}
                     {% else %}
-                        <a href="{{ pkg[field] }}">{{ pkg[field] }}</a>
+                      {% set link = pkg[field] %}
+                    {% endif %}
+
+                    {% if display_field and display_field in pkg %}
+                        <a href="{{ link }}">{{ pkg[display_field] }}</a>
+                    {% elif display_text %}
+                        <a href="{{ link }}">{{ display_text }}</a>
+                    {% else %}
+                        <a href="{{ link }}">{{ pkg[field] }}</a>
                     {% endif %}
                   {% elif ddi_config['fields'][section][field]['type'] == 'markdown' %}
                     {{ h.render_markdown(pkg[field], allow_html=True) }} 

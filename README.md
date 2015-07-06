@@ -115,6 +115,12 @@ fields:
             type: vocabulary
             visible: True
             display: Kind of Data
+    contact:
+        maintainer_email:
+            type: email
+            display_field: contact_persons
+            visible: True
+            display: Contact person
 
 vocabularies:
     kind_of_data:

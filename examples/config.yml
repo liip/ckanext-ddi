@@ -118,10 +118,11 @@ fields:
             visible: True
             display: Citation Requirement
     contacts:
-        contact_persons:
-            type: text
+        maintainer_email:
+            type: url
             visible: True
             display: Contact Persons
+            display_field: contact_persons
 
 vocabularies:
     study_type:
