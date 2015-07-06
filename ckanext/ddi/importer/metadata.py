@@ -76,8 +76,12 @@ class XPathMultiValue(XPathValue):
 class XPathTextValue(XPathValue):
     def get_value(self, **kwargs):
         value = super(XPathTextValue, self).get_value(**kwargs)
-        if hasattr(value, 'text') and value.text is not None:
+        if (hasattr(value, 'text') and
+                value.text is not None and
+                value.text.strip() != ''):
             return value.text.strip()
+        elif isinstance(value, basestring):
+            return value
         else:
             return ''
 
