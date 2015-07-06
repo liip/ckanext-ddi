@@ -117,11 +117,16 @@ fields:
             visible: True
             display: Kind of Data
     contact:
+        contact_persons:
+            type: text
+            visible: False
+            display: Contact Persons
         contact_persons_email:
             type: email
             display_field: contact_persons
             visible: True
             display: Contact person
+            internal_display: Contact Email
 
 vocabularies:
     kind_of_data:
