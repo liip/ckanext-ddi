@@ -2,7 +2,8 @@ import requests
 import codecs
 from pprint import pprint
 
-from ckan.lib.munge import munge_title_to_name
+import ckan.plugins.toolkit as tk
+from ckan.lib.munge import munge_title_to_name, munge_name
 from ckanext.harvest.harvesters import HarvesterBase
 from ckanext.ddi.importer import metadata
 
@@ -66,25 +67,36 @@ class DdiImporter(HarvesterBase):
             return self.insert_or_update_pkg(pkg_dict)
         except Exception, e:
             raise ContentImportError(
-                'Could not import package %s: %s'
-                % (pkg_dict['name'], e)
+                'Could not import dataset %s: %s'
+                % (pkg_dict.get('name', ''), e)
             )
 
     def insert_or_update_pkg(self, pkg_dict):
         registry = ckanapi.LocalCKAN(username=self.username)
-        if pkg_dict['id'] and pkg_dict['id'] != '':
-            try:
-                existing_pkg = registry.call_action('package_show', pkg_dict)
-                del pkg_dict['name']
+        allow_duplicates = tk.asbool(
+            config.get('ckanext.ddi.allow_duplicates', False)
+        )
+        override_datasets = tk.asbool(
+            config.get('ckanext.ddi.override_datasets', False)
+        )
+        try:
+            existing_pkg = registry.call_action('package_show', pkg_dict)
+            if not allow_duplicates and not override_datasets:
+                raise ContentDuplicateError(
+                    'Dataset already exists and duplicates are not allowed.'
+                )
+
+            if override_datasets:
+                pkg_dict.pop('id', None)
+                pkg_dict.pop('name', None)
                 existing_pkg.update(pkg_dict)
                 pkg_dict = existing_pkg
                 registry.call_action('package_update', pkg_dict)
-            except ckanapi.NotFound:
-                del pkg_dict['id']
-                pkg_dict['name'] = self._gen_new_name(pkg_dict['name'])
-                registry.call_action('package_create', pkg_dict)
-        else:
-            del pkg_dict['id']
+            else:
+                raise ckanapi.NotFound()
+        except ckanapi.NotFound:
+            pkg_dict.pop('id', None)
+            pkg_dict['name'] = self._gen_new_name(pkg_dict['name'])
             registry.call_action('package_create', pkg_dict)
 
         pprint(pkg_dict)
@@ -92,11 +104,14 @@ class DdiImporter(HarvesterBase):
 
     def improve_pkg_dict(self, pkg_dict, params):
         if pkg_dict['name'] != '':
-            pkg_dict['name'] = munge_title_to_name(pkg_dict['name'])
+            pkg_dict['name'] = munge_name(pkg_dict['name']).replace('_', '-')
         else:
             pkg_dict['name'] = munge_title_to_name(pkg_dict['title'])
         if pkg_dict['url'] == '':
-            del pkg_dict['url']
+            pkg_dict.pop('url', None)
+
+        # override the 'id' as this never matches the CKAN internal ID
+        pkg_dict['id'] = pkg_dict['name']
 
         if params is not None and params.get(license, None) is not None:
             pkg_dict['license_id'] = params['license']
@@ -111,4 +126,8 @@ class ContentFetchError(Exception):
 
 
 class ContentImportError(Exception):
+    pass
+
+
+class ContentDuplicateError(Exception):
     pass
