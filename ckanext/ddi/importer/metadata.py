@@ -76,8 +76,12 @@ class XPathMultiValue(XPathValue):
 class XPathTextValue(XPathValue):
     def get_value(self, **kwargs):
         value = super(XPathTextValue, self).get_value(**kwargs)
-        if hasattr(value, 'text') and value.text is not None:
+        if (hasattr(value, 'text') and
+                value.text is not None and
+                value.text.strip() != ''):
             return value.text.strip()
+        elif isinstance(value, basestring):
+            return value
         else:
             return ''
 
@@ -239,7 +243,8 @@ class CkanMetadata(object):
             'access_authority',
             'conditions',
             'citation_requirement',
-            'contact_persons'
+            'contact_persons',
+            'contact_persons_email',
         ])
 
     def get_attribute(self, ckan_attribute):
@@ -388,6 +393,9 @@ class DdiCkanMetadata(CkanMetadata):
         ),
         'contact_persons': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
+        ),
+        'contact_persons_email': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
         ),
         'url': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/@URI"  # noqa
