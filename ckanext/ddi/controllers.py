@@ -101,16 +101,19 @@ class ImportFromXml(PackageController):
 
     def run_import(self, data=None, errors=None, error_summary=None):
         pkg_id = None
+        file_path = None
         try:
             user = c.user or c.author
             importer = ddiimporter.DdiImporter(username=user)
-            file_path = None
 
             if request.params['upload'] != '':
                 log.debug('upload: %s' % request.params['upload'])
                 file_path = self._save_temp_file(request.params['upload'].file)
                 log.debug('file_path: %s' % file_path)
-                pkg_id = importer.run(file_path=file_path)
+                pkg_id = importer.run(
+                    file_path=file_path,
+                    upload=request.params['upload']
+                )
             elif 'url' in request.params and request.params['url']:
                 log.debug('url: %s' % request.params['url'])
                 pkg_id = importer.run(url=request.params['url'])

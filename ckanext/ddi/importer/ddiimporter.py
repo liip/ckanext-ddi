@@ -18,7 +18,7 @@ class DdiImporter(HarvesterBase):
     def __init__(self, username=None):
         self.username = username
 
-    def run(self, file_path=None, url=None, params=None):
+    def run(self, file_path=None, url=None, params=None, upload=None):
         pkg_dict = None
         ckan_metadata = metadata.DdiCkanMetadata()
         if file_path is not None:
@@ -64,14 +64,14 @@ class DdiImporter(HarvesterBase):
 
         pkg_dict = self.improve_pkg_dict(pkg_dict, params)
         try:
-            return self.insert_or_update_pkg(pkg_dict)
+            return self.insert_or_update_pkg(pkg_dict, upload)
         except Exception, e:
             raise ContentImportError(
                 'Could not import dataset %s: %s'
                 % (pkg_dict.get('name', ''), e)
             )
 
-    def insert_or_update_pkg(self, pkg_dict):
+    def insert_or_update_pkg(self, pkg_dict, upload=None):
         registry = ckanapi.LocalCKAN(username=self.username)
         allow_duplicates = tk.asbool(
             config.get('ckanext.ddi.allow_duplicates', False)
@@ -98,6 +98,23 @@ class DdiImporter(HarvesterBase):
             pkg_dict.pop('id', None)
             pkg_dict['name'] = self._gen_new_name(pkg_dict['name'])
             registry.call_action('package_create', pkg_dict)
+
+        if upload is not None:
+            try:
+                registry.call_action(
+                    'resource_create',
+                    {
+                        'package_id': pkg_dict['name'],
+                        'upload': upload,
+                        'name': 'DDI XML of %s' % pkg_dict['title'],
+                        'format': 'xml',
+                        'url': '',
+                    }
+                )
+            except Exception, e:
+                raise UploadError(
+                    'Could not upload file: %s' % str(e)
+                )
 
         pprint(pkg_dict)
         return pkg_dict['name']
@@ -130,4 +147,8 @@ class ContentImportError(Exception):
 
 
 class ContentDuplicateError(Exception):
+    pass
+
+
+class UploadError(Exception):
     pass
