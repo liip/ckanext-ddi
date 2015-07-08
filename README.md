@@ -7,9 +7,9 @@ DDI extension for CKAN for the Worldbank.
 
 Features:
 
-* Import DDI data
-* Manage DDI data manually via the CKAN frontend
-* Upload DDI files (XML) to a CKAN instance
+* [Import DDI data via command line](#run-import-from-command-line)
+* [Manage DDI data manually via the CKAN frontend](#manage-ddi-datasets)
+* [Upload DDI files (XML) to a CKAN instance](#import)
 * [Harvest data from a NADA instance](#nada-harvester)
 
 
@@ -157,6 +157,9 @@ Based on this configuration the web UI is generated:
 Data can be imported either via command line or using the web interface.
 
 ### Web interface
+
+#### Import
+
 If you are logged in and you have the appropriate permissions, you find a new button "Import Dataset from DDI/XML" on the dataset page.
 
 ![Import Dataset from DDI/XML button](https://raw.github.com/liip/ckanext-ddi/master/screenshots/add_dataset_button.png)
@@ -164,6 +167,8 @@ If you are logged in and you have the appropriate permissions, you find a new bu
 This buttons leads you to an import page, where a DDI XML can either be uploaded or specified as URL.
 
 ![Import Dataset page](https://raw.github.com/liip/ckanext-ddi/master/screenshots/import_dataset.png)
+
+#### Manage DDI datasets
 
 Instead of importing the DDI data, you can manually add datasets just like you would on any CKAN instance.
 The "Add Dataset" form is modified, so you can find all the fields from your DDI configuration (see above).
