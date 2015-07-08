@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.1'
+version = '1.0.0'
 
 setup(
     name='ckanext-ddi',
@@ -14,7 +14,7 @@ setup(
     author='Liip AG',
     author_email='ogd@liip.ch',
     url='http://www.liip.ch',
-    license='GPL',
+    license='AGPL',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=['ckanext', 'ckanext.ddi'],
     include_package_data=True,
