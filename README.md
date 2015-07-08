@@ -7,10 +7,11 @@ DDI extension for CKAN for the Worldbank.
 
 Features:
 
-* Import DDI data
-* Manage DDI data manually via the CKAN frontend
-* Upload DDI files (XML) to a CKAN instance
-* Harvest data from a [NADA](http://www.ihsn.org/home/projects/NADA-development) instance
+* [Configuration of DDI fields to customize display](#ddi-fields-configuration)
+* [Import DDI data via command line](#run-import-from-command-line)
+* [Upload DDI files (XML) to a CKAN instance](#import)
+* [Manage DDI data manually via the CKAN frontend](#manage-ddi-datasets)
+* [Harvest data from a NADA instance](#nada-harvester)
 
 
 ## Installation
@@ -157,6 +158,9 @@ Based on this configuration the web UI is generated:
 Data can be imported either via command line or using the web interface.
 
 ### Web interface
+
+#### Import
+
 If you are logged in and you have the appropriate permissions, you find a new button "Import Dataset from DDI/XML" on the dataset page.
 
 ![Import Dataset from DDI/XML button](https://raw.github.com/liip/ckanext-ddi/master/screenshots/add_dataset_button.png)
@@ -164,6 +168,8 @@ If you are logged in and you have the appropriate permissions, you find a new bu
 This buttons leads you to an import page, where a DDI XML can either be uploaded or specified as URL.
 
 ![Import Dataset page](https://raw.github.com/liip/ckanext-ddi/master/screenshots/import_dataset.png)
+
+#### Manage DDI datasets
 
 Instead of importing the DDI data, you can manually add datasets just like you would on any CKAN instance.
 The "Add Dataset" form is modified, so you can find all the fields from your DDI configuration (see above).
@@ -183,7 +189,7 @@ paster --plugin=ckanext-ddi ddi import <path_or_url> [<license>] -c <path to con
 * `<license>` is an optional parameter to specify the license of the dataset. Ideally this is a value from the [configured license group file](http://docs.ckan.org/en/943-writing-extensions-tutorial/configuration.html#licenses-group-url).
 
 ### NADA harvester
-To add a NADA harvester, you should be logged in and visit `/harvest` on your CKAN installation (e.g. http://my.ckaninstance.org/harvest).
+To add a harvester for a [NADA](http://www.ihsn.org/home/projects/NADA-development) instance, you should be logged in and visit `/harvest` on your CKAN installation (e.g. http://my.ckaninstance.org/harvest).
 There you can add a new harvest source with the type "NADA harvester for DDI".
 
 In the URL field, specify the base URL of your NADA instance. If the start page of your NADA instance is my.nada-instance.org/index.php/home, then please specify http://my.nada-instance.org as the URL for the harvester.
