@@ -8,8 +8,8 @@ DDI extension for CKAN for the Worldbank.
 Features:
 
 * [Import DDI data via command line](#run-import-from-command-line)
-* [Manage DDI data manually via the CKAN frontend](#manage-ddi-datasets)
 * [Upload DDI files (XML) to a CKAN instance](#import)
+* [Manage DDI data manually via the CKAN frontend](#manage-ddi-datasets)
 * [Harvest data from a NADA instance](#nada-harvester)
 
 
