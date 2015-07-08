@@ -7,6 +7,7 @@ DDI extension for CKAN for the Worldbank.
 
 Features:
 
+* [Configuration of DDI fields to customize display](#ddi-fields-configuration)
 * [Import DDI data via command line](#run-import-from-command-line)
 * [Upload DDI files (XML) to a CKAN instance](#import)
 * [Manage DDI data manually via the CKAN frontend](#manage-ddi-datasets)
