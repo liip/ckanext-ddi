@@ -229,3 +229,7 @@ flake8 --install-hook
 ```
 
 Travis CI is used to check the code for all PRs.
+
+## Acknowledgements
+
+This module was developed with support from the World Bank to provide a solution for National Statistical Offices (NSOs) that need to publish data on CKAN platforms.
