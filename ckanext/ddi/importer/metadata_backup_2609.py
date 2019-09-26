@@ -212,7 +212,7 @@ class CkanMetadata(object):
             'url',
             'author',
             'author_email',
-            'publisher_name',
+            'maintainer',
             'maintainer_email',
             'license_id',
             'copyright',
@@ -226,13 +226,12 @@ class CkanMetadata(object):
             'id_number',
             'description',
             'production_type',
-            'issued',
+            'production_date',
             'abstract',
             'kind_of_data',
             'unit_of_analysis',
             'description_of_scope',
             'country',
-            'member_countries',
             'geographic_coverage',
             'time_period_covered',
             'universe',
@@ -244,12 +243,8 @@ class CkanMetadata(object):
             'access_authority',
             'conditions',
             'citation_requirement',
-            'contact_name',
-            'contact_email',
-            'contact_uri',
-            'language',
-            'temporal_start',
-            'temporal_end'
+            'contact_persons',
+            'contact_persons_email',
         ])
 
     def get_attribute(self, ckan_attribute):
@@ -300,8 +295,8 @@ class DdiCkanMetadata(CkanMetadata):
         'description': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
-        'issued': XPathTextValue(
-            "//ddi:codeBook/ddi:docDscr//ddi:citation/ddi:prodStmt/ddi:prodDate/@date"  # noqa
+        'production_date': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr//ddi:citation/ddi:verStmt/ddi:version/@date"  # noqa
         ),
         'production_type': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:method/ddi:collMode"  # noqa
@@ -318,12 +313,9 @@ class DdiCkanMetadata(CkanMetadata):
         'description_of_scope': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:abstract"  # noqa
         ),
-        'country': XPathTextValue(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation"
-        ),
-        'member_countries': ArrayTextValue(
+        'country': ArrayTextValue(
             XPathMultiTextValue(
-                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation/@abbr"  # noqa
+                "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:nation"  # noqa
             ),
             separator=', '
         ),
@@ -399,14 +391,11 @@ class DdiCkanMetadata(CkanMetadata):
         'citation_requirement': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:useStmt/ddi:citReq"  # noqa
         ),
-        'contact_name': XPathTextValue(
+        'contact_persons': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
-        'contact_email': XPathTextValue(
+        'contact_persons_email': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
-        ),
-        'contact_uri': XPathTextValue(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@uri"
         ),
         'url': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:dataAccs/ddi:setAvail/ddi:accsPlac/@URI"  # noqa
@@ -420,8 +409,8 @@ class DdiCkanMetadata(CkanMetadata):
         ),
         # TODO: Do we need that? What DDI field should be used?
         'author_email': StringValue(''),
-        'publisher_name': XPathTextValue(
-            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:prodStmt/ddi:producer"  # noqa
+        'maintainer': XPathTextValue(
+            "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact"  # noqa
         ),
         'maintainer_email': XPathTextValue(
             "//ddi:codeBook/ddi:stdyDscr/ddi:citation/ddi:distStmt/ddi:contact/@email"  # noqa
@@ -442,9 +431,6 @@ class DdiCkanMetadata(CkanMetadata):
                 "//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:subject/ddi:keyword"  # noqa
             )
         ]),
-        'language': XPathTextValue('//ddi:codeBook/@xml-lang'),
-        'temporal_start': XPathTextValue("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='start']/@date"),
-        'temporal_end': XPathTextValue("//ddi:codeBook/ddi:stdyDscr/ddi:stdyInfo/ddi:sumDscr/ddi:collDate[@event='end']/@date")
     }
 
     def get_mapping(self):
