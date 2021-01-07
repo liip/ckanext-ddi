@@ -1,6 +1,6 @@
 # This file lists the dependencies of this extension.
 # Install with a command like: pip install -r requirements.txt 
-lxml==2.2.4
+lxml==4.6.2
 pyyaml==5.1
 requests==2.20.0
 ckanapi==3.4
