@@ -2,6 +2,6 @@
 # Install with a command like: pip install -r requirements.txt 
 lxml==4.6.5
 pyyaml==5.4
-requests==2.20.0
+requests==2.31.0
 ckanapi==3.4
 flake8==2.1.0
